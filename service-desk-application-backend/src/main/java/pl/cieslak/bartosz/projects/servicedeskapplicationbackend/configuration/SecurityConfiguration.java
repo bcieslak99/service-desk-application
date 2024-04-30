@@ -41,7 +41,7 @@ public class SecurityConfiguration
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/auth/token/refresh").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/token/refresh").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/auth/token/validation").permitAll()
                                 .anyRequest().authenticated()
                 )

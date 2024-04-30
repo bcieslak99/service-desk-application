@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
+import {userIsLoggedInGuard, userIsNotLoggedInGuard} from "./guards/guards";
 
 const routes: Routes = [
   {
@@ -9,7 +10,13 @@ const routes: Routes = [
   },
   {
     path: "auth",
-    loadChildren: () => import('../app/modules/auth/auth.module').then((m) => m.AuthModule)
+    loadChildren: () => import('../app/modules/auth/auth.module').then((m) => m.AuthModule),
+    canActivate: [userIsLoggedInGuard]
+  },
+  {
+    path: "employee",
+    loadChildren: () => import("../app/modules/employee-panel/employee-panel.module").then((m) => m.EmployeePanelModule),
+    canActivate: [userIsNotLoggedInGuard]
   },
   {
     path: "**",

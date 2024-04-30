@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class AuthResponse
+public class AuthData
 {
     private String name;
     private String surname;

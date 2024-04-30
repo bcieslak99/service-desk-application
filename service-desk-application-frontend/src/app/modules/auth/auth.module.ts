@@ -5,6 +5,8 @@ import {AuthRoutingModule} from "./auth-routing.module";
 import {MatCardModule} from "@angular/material/card";
 import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
+import {ReactiveFormsModule} from "@angular/forms";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
@@ -15,7 +17,9 @@ import {MatButtonModule} from "@angular/material/button";
     AuthRoutingModule,
     MatCardModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
   ]
 })
 export class AuthModule {}

@@ -8,6 +8,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.AuthRequest;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.AuthData;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.JWTToken;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.NewUserDTO;
@@ -16,6 +18,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.jwt.Au
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin
 @RequestMapping("/api/v1/auth")
 public class AuthController
 {
@@ -68,9 +71,9 @@ public class AuthController
         return this.AUTH_SERVICE.validateToken(request);
     }
 
-    @GetMapping("/token/refresh")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request)
+    @PostMapping("/token/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody JWTToken authData)
     {
-        return this.AUTH_SERVICE.refreshToken(request);
+        return this.AUTH_SERVICE.refreshToken(authData);
     }
 }

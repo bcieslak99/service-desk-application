@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthService
 {
-    private static final String BAD_USERNAME_OR_PASSWORD_MESSAGE = "Zły login lub hasło.";
+    private static final String BAD_USERNAME_OR_PASSWORD_MESSAGE = "Podano zły login lub hasło.";
     private static final String INTERNAL_SERVER_ERROR_MESSAGE = "Nieoczekiwany błąd serwera.";
     private static final String INCORRECT_TOKEN_MESSAGE = "Token jest nieprawidłowy.";
     private static final String TOKEN_IS_ACTIVE_MESSAGE = "Token jest aktywny.";
@@ -96,7 +97,7 @@ public class AuthService
                 {
                     User user = userInDatabase.get();
 
-                    AuthResponse tokenResponse = new AuthResponse();
+                    AuthData tokenResponse = new AuthData();
 
                     tokenResponse.setToken(this.JWT_SERVICE.createToken(user));
                     tokenResponse.setRefreshToken(this.JWT_SERVICE.createRefreshToken(user));
@@ -120,7 +121,7 @@ public class AuthService
                 return ResponseEntity.badRequest().body(responseMessage);
             }
         }
-        catch(UsernameNotFoundException | DisabledException exception)
+        catch(UsernameNotFoundException | DisabledException | BadCredentialsException exception)
         {
             ResponseMessage responseMessage = new ResponseMessage(BAD_USERNAME_OR_PASSWORD_MESSAGE, ResponseCode.ERROR);
             return ResponseEntity.badRequest().body(responseMessage);
@@ -152,9 +153,9 @@ public class AuthService
         return this.JWT_SERVICE.extractUserIdFromToken(token);
     }
 
-    public ResponseEntity<?> refreshToken(HttpServletRequest request)
+    public ResponseEntity<?> refreshToken(JWTToken authData)
     {
-        UUID userId = extractUserIdFromRequest(request);
+        UUID userId = JWT_SERVICE.extractUserIdFromToken(authData.getToken());
 
         if(userId == null)
         {
@@ -172,7 +173,7 @@ public class AuthService
 
         User user = userInDatabase.get();
 
-        AuthResponse token = new AuthResponse();
+        AuthData token = new AuthData();
         token.setToken(this.JWT_SERVICE.createToken(user));
         token.setRefreshToken(this.JWT_SERVICE.createRefreshToken(user));
         UserDetails userDetails = new UserEntityDetails(user);

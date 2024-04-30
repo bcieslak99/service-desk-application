@@ -1,21 +1,21 @@
-<div class="container mt-5">
+<div class="container mt-5" *ngIf="!userDataIsChecking(); else spinner">
   <div class="row justify-content-center">
     <div class="col-12 col-sm-11 col-md-9 col-lg-6">
-      <h2 class="text-center">Service Desk</h2>
+      <h1 class="text-center">Service Desk</h1>
       <mat-card class="p-3">
         <mat-card-title class="text-center">Logowanie</mat-card-title>
-        <mat-card-content class="mt-3">
-          <form class="text-center">
+        <mat-card-content class="mt-3 text-center">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
             <mat-form-field>
               <mat-label>E-mail</mat-label>
-              <input type="email" matInput placeholder="Podaj adres E-mail">
+              <input type="email" matInput placeholder="Podaj adres E-mail" formControlName="mail">
             </mat-form-field>
             <mat-form-field class="mt-3">
               <mat-label>Hasło</mat-label>
-              <input type="password" matInput placeholder="Podaj hasło">
+              <input type="password" matInput placeholder="Podaj hasło" formControlName="password" value="b1f9def3-8a0b-4679-88a3-8eaf6af7a8b0">
             </mat-form-field>
             <div>
-              <button mat-raised-button color="primary">Zaloguj się</button>
+              <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">Zaloguj się</button>
             </div>
           </form>
         </mat-card-content>
@@ -23,3 +23,14 @@
     </div>
   </div>
 </div>
+
+<ng-template #spinner>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-7 text-center">
+        <mat-spinner class="spinner"></mat-spinner>
+        <h3 class="mt-5">Ładowanie Aplikacji</h3>
+      </div>
+    </div>
+  </div>
+</ng-template>
