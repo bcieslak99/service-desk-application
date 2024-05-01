@@ -8,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.AuthRequest;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.AuthData;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.JWTToken;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;

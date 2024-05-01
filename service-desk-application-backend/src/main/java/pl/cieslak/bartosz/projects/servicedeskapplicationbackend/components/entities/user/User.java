@@ -11,8 +11,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Component;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketActivity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static pl.cieslak.bartosz.projects.servicedeskapplicationbackend.configuration.data.validation.UserDataValidation.*;
@@ -28,7 +33,7 @@ public class User
 {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "USER_ID", nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, unique = true, updatable = false)
     private UUID id;
 
     @NotNull
@@ -74,4 +79,22 @@ public class User
     @Size(max = MAXIMUM_LENGTH_OF_PHONE_NUMBER)
     @Column(name = "PHONE_NUMBER")
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "groupManager")
+    private List<SupportGroup> ownedGroups = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "groupMembers")
+    private List<SupportGroup> userGroups = new ArrayList<>();
+
+    @OneToMany(mappedBy = "customer")
+    private List<Ticket> ownTickets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reporter")
+    private List<Ticket> reportedTickets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "assigneeAnalyst")
+    private List<Ticket> assignedTickets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "analyst")
+    private List<TicketActivity> ticketActivities = new ArrayList<>();
 }
