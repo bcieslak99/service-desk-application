@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.stereotype.Component;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketCategory;
@@ -23,6 +20,7 @@ import static pl.cieslak.bartosz.projects.servicedeskapplicationbackend.configur
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Component
 @Entity
 @Table(name = "SUPPORT_GROUPS")
