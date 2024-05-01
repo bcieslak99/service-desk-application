@@ -26,6 +26,15 @@ create table support_groups
     foreign key (manager_id) references users(id)
 );
 
+insert into support_groups (id, name, description, group_type, group_is_active, manager_id)
+VALUES
+    ('1a396d8e-3777-4f36-9d51-1aeb03350133', 'Service Desk', 'Pierwsza linia wsparcia - Service Desk.', 'FIRST_LINE', true, null),
+    ('8e16b7ce-276b-4eee-a8e3-ec2caf416e9c', 'AD-ADM', 'Grupa odpowiedzialna za Active Directory.', 'SECOND_LINE', true, null),
+    ('f84267a2-40ff-4b4b-b0b7-92b811b1a936', 'LAN/WAN/VPN-ADM', 'Grupa odpowiedzialna za działanie sieci.', 'SECOND_LINE', true, null),
+    ('5bc2eb58-e2a1-4178-a440-7e52eaa07249', 'Poczta-ADM', 'Grupa odpowiedzialna za działanie skrzynek mailowych.', 'SECOND_LINE', true, null),
+    ('624efe20-bc19-4383-b514-a9706dba47e0', 'Lokalne Wsparcie', 'Grupa wsparcia bezpośredniego.', 'SECOND_LINE', true, null),
+    ('e2cfa830-4211-42ae-a101-e33f650507dd', 'Bezpieczeństwo IT', 'Grupa odpowiedzialna za bezpieczeństwo IT.', 'SECOND_LINE', true, null);
+
 create table group_members
 (
     group_id uuid not null,
