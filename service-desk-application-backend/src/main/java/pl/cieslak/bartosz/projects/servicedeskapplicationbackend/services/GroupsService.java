@@ -47,10 +47,12 @@ public class GroupsService
 
         SupportGroup group = new SupportGroup();
         group.setName(groupData.getName());
-        group.setDescription(group.getDescription());
-        group.setGroupType(group.getGroupType());
+        group.setDescription(groupData.getDescription());
+        group.setGroupType(groupData.getGroupType());
         group.setGroupActive(true);
-        group.setGroupManager(this.USER_SERVICE.getUserById(groupData.getManagerId()).orElse(null));
+
+        if(groupData.getManagerId() != null)
+            group.setGroupManager(this.USER_SERVICE.getUserById(groupData.getManagerId()).orElse(null));
 
         return group;
     }
@@ -100,6 +102,7 @@ public class GroupsService
         }
         catch(Exception exception)
         {
+            exception.printStackTrace();
             return ResponseEntity.internalServerError()
                     .body(new ResponseMessage("Napotkano nieoczekiwane błąd podczas tworzenia grupy!",
                             ResponseCode.ERROR));
@@ -161,7 +164,7 @@ public class GroupsService
                 group.setGroupActive(false);
                 this.GROUP_REPOSITORY.saveAndFlush(group);
 
-                return ResponseEntity.ok(new ResponseMessage("Grupa została aktywowana.", ResponseCode.SUCCESS));
+                return ResponseEntity.ok(new ResponseMessage("Grupa została dezaktywowana.", ResponseCode.SUCCESS));
             }
         }
         catch(GroupNotFoundException exception)
@@ -190,9 +193,9 @@ public class GroupsService
 
             SupportGroup group = groupInDatabase.get();
 
-            group.setName(group.getName());
-            group.setDescription(group.getDescription());
-            group.setGroupType(group.getGroupType());
+            group.setName(groupData.getName());
+            group.setDescription(groupData.getDescription());
+            group.setGroupType(groupData.getGroupType());
             group.setGroupActive(groupData.isGroupActive());
 
             if(groupData.getManagerId() == null) group.setGroupManager(null);
@@ -279,6 +282,8 @@ public class GroupsService
 
             if(user.isPresent()) group.getGroupMembers().remove(user.get());
             else return ResponseEntity.ok(new ResponseMessage("Ten użytkownik nie był członkiem grupy.", ResponseCode.SUCCESS));
+
+            this.GROUP_REPOSITORY.saveAndFlush(group);
 
             return ResponseEntity.ok(new ResponseMessage("Użytkownik został usunięty z grupy.", ResponseCode.SUCCESS));
         }

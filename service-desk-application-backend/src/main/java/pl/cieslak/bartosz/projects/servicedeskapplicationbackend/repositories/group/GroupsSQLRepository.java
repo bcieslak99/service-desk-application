@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 interface GroupsSQLRepository extends JpaRepository<SupportGroup, UUID>, GroupsRepository
 {
-    @Query("select sg from SupportGroup as sg left join fetch sg.groupMembers as gm where sg.groupActive = true")
+    @Query("select sg from SupportGroup as sg left join fetch sg.groupMembers as gm where sg.groupActive = true order by sg.name")
     List<SupportGroup> getActiveGroups();
 
     Optional<SupportGroup> getSupportGroupByName(String name);
