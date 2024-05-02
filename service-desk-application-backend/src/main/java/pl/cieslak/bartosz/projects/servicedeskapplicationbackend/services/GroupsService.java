@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupDetailsDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupMemberDetailsDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupMembersListDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.NewGroupDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
@@ -296,6 +298,57 @@ public class GroupsService
             return ResponseEntity.internalServerError()
                     .body(new ResponseMessage("Napotkano nieoczekiwany błąd podczas usuwania użytkownika z grupy!",
                             ResponseCode.ERROR));
+        }
+    }
+
+    public GroupMemberDetailsDTO prepareUserAsGroupMemberDetails(User user)
+    {
+        if(user == null) return null;
+        GroupMemberDetailsDTO details = new GroupMemberDetailsDTO();
+
+        details.setId(user.getId());
+        details.setName(user.getName());
+        details.setSurname(user.getSurname());
+        details.setMail(user.getMail());
+        details.setPhoneNumber(user.getPhoneNumber());
+        details.setUserActive(user.isActive());
+
+        return details;
+    }
+
+    public ResponseEntity<?> getGroupMembers(UUID groupId)
+    {
+        if(groupId == null)
+            return ResponseEntity.badRequest()
+                    .body(new ResponseMessage("Wskazano nieprawidłowe ID grupy!", ResponseCode.ERROR));
+
+        try
+        {
+            Optional<SupportGroup> groupInDatabase = getGroupAndMembersById(groupId);
+            if(groupInDatabase.isEmpty()) throw new GroupNotFoundException("Nie odnaleziono wskazanej grupy");
+            SupportGroup group = groupInDatabase.get();
+
+            GroupMembersListDTO groupMembers = new GroupMembersListDTO();
+            groupMembers.setManager(prepareUserAsGroupMemberDetails(group.getGroupManager()));
+
+            List<GroupMemberDetailsDTO> members = new ArrayList<>();
+            for(User user : group.getGroupMembers())
+                members.add(prepareUserAsGroupMemberDetails(user));
+
+            members = members.stream().filter(Objects::nonNull).collect(Collectors.toList());
+
+            groupMembers.setMembers(members);
+
+            return ResponseEntity.ok(groupMembers);
+        }
+        catch(GroupNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError()
+                    .body(new ResponseMessage("Napotkano nieoczekiwany błąd serwera!", ResponseCode.ERROR));
         }
     }
 }

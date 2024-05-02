@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupDetailsDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupMembersListDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.MemberID;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.NewGroupDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
@@ -92,5 +93,12 @@ public class GroupController
             return ResponseEntity.badRequest().body(new ResponseMessage("Błąd! Podano nie prawidłowe dane!", ResponseCode.ERROR));
 
         return this.GROUP_SERVICE.removeMemberToGroup(groupId, memberId.getUserId());
+    }
+
+    @GetMapping("/members/{id}")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<?> getMembersOfGroup(@PathVariable("id") UUID groupId)
+    {
+        return this.GROUP_SERVICE.getGroupMembers(groupId);
     }
 }
