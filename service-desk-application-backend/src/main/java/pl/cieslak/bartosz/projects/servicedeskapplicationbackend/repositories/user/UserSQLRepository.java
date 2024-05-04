@@ -1,9 +1,11 @@
 package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,4 +13,7 @@ import java.util.UUID;
 interface UserSQLRepository extends JpaRepository<User, UUID>, UserRepository
 {
     Optional<User> getUserByMail(String mail);
+
+    @Query("select u from User as u order by u.surname, u.name, u.mail")
+    List<User> getAllUsers();
 }

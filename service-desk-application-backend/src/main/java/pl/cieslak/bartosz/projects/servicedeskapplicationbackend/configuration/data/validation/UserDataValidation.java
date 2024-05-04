@@ -13,6 +13,5 @@ public class UserDataValidation
     public static final int MAXIMUM_LENGTH_OF_USER_MAIL = MAXIMUM_LENGTH_OF_USER_NAME + MAXIMUM_LENGTH_OF_USER_SURNAME + 25;
     public static final int MINIMUM_LENGTH_OF_USER_PASSWORD = 8;
     public static final int MAXIMUM_LENGTH_OF_USER_PASSWORD = 120;
-    public static final int MINIMUM_LENGTH_OF_PHONE_NUMBER = 9;
     public static final int MAXIMUM_LENGTH_OF_PHONE_NUMBER = 14;
 }

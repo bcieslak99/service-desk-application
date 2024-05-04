@@ -13,7 +13,7 @@ public class FirstAdministratorAccount implements CommandLineRunner
 {
     private final AuthService AUTH_SERVICE;
     private static final String ADMINISTRATOR_ACCOUNT_NAME = "root";
-    private static final String ADMINISTRATOR_ACCOUNT_MAIL = "root@appliaction.local";
+    public static final String ADMINISTRATOR_ACCOUNT_MAIL = "root@appliaction.local";
     private static final String ADMINISTRATOR_ACCOUNT_PASSWORD = "b1f9def3-8a0b-4679-88a3-8eaf6af7a8b0";
 
     @Override
