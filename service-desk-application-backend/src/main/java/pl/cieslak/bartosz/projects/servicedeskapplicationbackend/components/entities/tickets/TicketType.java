@@ -3,7 +3,6 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.ent
 public enum TicketType
 {
     SERVICE_REQUEST,
-    REQUEST_OF_CHANGE,
     INCIDENT,
     PROBLEM
 }
