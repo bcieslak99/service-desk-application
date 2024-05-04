@@ -137,7 +137,7 @@ public class TicketCategoryService
             SupportGroup group = groupInDatabase.get();
 
             category.setName(categoryData.getName());
-            category.setDescription(category.getDescription());
+            category.setDescription(categoryData.getDescription());
             category.setTicketType(categoryData.getTicketType());
             category.setDefaultGroup(group);
 

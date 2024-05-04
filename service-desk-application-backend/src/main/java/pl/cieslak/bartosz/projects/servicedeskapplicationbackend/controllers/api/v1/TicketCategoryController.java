@@ -93,8 +93,6 @@ public class TicketCategoryController
         if(errors.hasErrors())
             return ResponseEntity.badRequest().body(new ResponseMessage("Podano nieprawidłowe dane!", ResponseCode.ERROR));
 
-
-
-        return null;
+        return this.TICKET_CATEGORY_SERVICE.editCategoryData(categoryId, categoryData);
     }
 }
