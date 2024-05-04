@@ -143,16 +143,6 @@ public class AuthService
         return authHeader.substring(TOKEN_PREFIX.length()).trim();
     }
 
-    private UUID extractUserIdFromRequest(HttpServletRequest request)
-    {
-        if(request == null) return null;
-
-        String token = extractToken(request);
-        if(token == null) return null;
-
-        return this.JWT_SERVICE.extractUserIdFromToken(token);
-    }
-
     public ResponseEntity<?> refreshToken(JWTToken authData)
     {
         UUID userId = JWT_SERVICE.extractUserIdFromToken(authData.getToken());

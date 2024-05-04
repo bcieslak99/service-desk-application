@@ -12,4 +12,5 @@ public interface UserRepository
     Optional<User> findById(UUID id);
     User saveAndFlush(User user);
     List<User> getAllUsers();
+    Optional<User> getUserById(UUID userId);
 }

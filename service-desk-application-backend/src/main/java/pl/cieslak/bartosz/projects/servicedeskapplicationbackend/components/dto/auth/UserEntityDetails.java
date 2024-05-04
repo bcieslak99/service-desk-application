@@ -3,6 +3,7 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.GroupType;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.configuration.SecurityConfiguration;
 
@@ -38,6 +39,12 @@ public class UserEntityDetails implements UserDetails
 
             if(user.isAdministrator())
                 this.authorities.add(new SimpleGrantedAuthority(SecurityConfiguration.ADMINISTRATOR_ROLE_NAME));
+
+            if(user.getUserGroups().stream().anyMatch(group -> group.isGroupActive() && group.getGroupType().equals(GroupType.FIRST_LINE)))
+                this.authorities.add(new SimpleGrantedAuthority(SecurityConfiguration.FIRST_LINE_ANALYST_ROLE_NAME));
+
+            if(user.getUserGroups().stream().anyMatch(group -> group.isGroupActive() && group.getGroupType().equals(GroupType.SECOND_LINE)))
+                this.authorities.add(new SimpleGrantedAuthority(SecurityConfiguration.SECOND_LINE_ANALYST_ROLE_NAME));
         }
     }
 

@@ -31,6 +31,8 @@ public class SecurityConfiguration
     public static final String ACTIVE_USER_ROLE_NAME = "ACTIVE_USER";
     public static final String EMPLOYEE_ROLE_NAME = "EMPLOYEE";
     public static final String ADMINISTRATOR_ROLE_NAME = "SYSTEM_ADMINISTRATOR";
+    public static final String FIRST_LINE_ANALYST_ROLE_NAME = "FIRST_LINE_ANALYST";
+    public static final String SECOND_LINE_ANALYST_ROLE_NAME = "SECOND_LINE_ANALYST";
     private final UserRepository USER_REPOSITORY;
     private final JWTAuthFilter JWT_AUTH_FILTER;
 
