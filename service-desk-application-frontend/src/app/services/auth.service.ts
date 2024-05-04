@@ -12,14 +12,8 @@ import {Router, UrlTree} from "@angular/router";
 export class AuthService
 {
   userLogged: AuthData | null = null;
-  checkingUserData: boolean = true;
 
   constructor(private http: HttpClient, private notifier: NotifierService, private router: Router) {}
-
-  userDataIsChecking(): boolean
-  {
-    return this.checkingUserData;
-  }
 
   userIsLogged(): boolean
   {
@@ -80,21 +74,18 @@ export class AuthService
       let refreshToken: JWTToken = {
         token: this.userLogged.refreshToken.token
       };
-      
+
       this.refreshToken(refreshToken).subscribe({
         next: value => {
           this.userLogged = value;
           localStorage.setItem("userLogged", JSON.stringify(value));
-          this.checkingUserData = false;
           this.router.navigateByUrl(this.redirectUser())
         },
         error: err => {
           localStorage.removeItem("userLogged");
           this.userLogged = null;
-          this.checkingUserData = false;
         }
       })
     }
-    else this.checkingUserData = false
   }
 }

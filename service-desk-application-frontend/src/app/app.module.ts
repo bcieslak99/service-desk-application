@@ -8,9 +8,13 @@ import {RouterOutlet} from "@angular/router";
 import { NavbarComponent } from './components/navbar/navbar.component';
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatIconModule} from "@angular/material/icon";
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {NotifierModule, NotifierOptions} from "angular-notifier";
 import {MatButtonModule} from "@angular/material/button";
+import { GlobalSpinnerComponent } from './components/global-spinner/global-spinner.component';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {GlobalSpinnerInterceptor} from "./guards_and_interceptors/global-spinner.interceptor";
+import {AuthorizationInterceptor} from "./guards_and_interceptors/authorization.interceptor";
 
 const notifierConfig: NotifierOptions = {
   theme: "material"
@@ -19,7 +23,8 @@ const notifierConfig: NotifierOptions = {
 @NgModule({
   declarations: [
     AppComponent,
-    NavbarComponent
+    NavbarComponent,
+    GlobalSpinnerComponent
   ],
   imports: [
     BrowserModule,
@@ -30,9 +35,13 @@ const notifierConfig: NotifierOptions = {
     MatIconModule,
     HttpClientModule,
     NotifierModule.withConfig(notifierConfig),
-    MatButtonModule
+    MatButtonModule,
+    MatProgressSpinnerModule
   ],
-  providers: [],
+  providers: [
+    {provide: HTTP_INTERCEPTORS, useClass: GlobalSpinnerInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: AuthorizationInterceptor, multi: true}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

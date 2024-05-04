@@ -20,9 +20,4 @@ export class LoginPanelComponent
   {
     this.auth.loginUser(this.loginForm.getRawValue());
   }
-
-  userDataIsChecking(): boolean
-  {
-    return this.auth.userDataIsChecking();
-  }
 }

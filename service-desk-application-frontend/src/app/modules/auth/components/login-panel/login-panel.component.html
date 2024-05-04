@@ -1,4 +1,4 @@
-<div class="container mt-5" *ngIf="!userDataIsChecking(); else spinner">
+<div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-12 col-sm-11 col-md-9 col-lg-6">
       <h1 class="text-center">Service Desk</h1>
@@ -23,14 +23,3 @@
     </div>
   </div>
 </div>
-
-<ng-template #spinner>
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-10 col-lg-7 text-center">
-        <mat-spinner class="spinner"></mat-spinner>
-        <h3 class="mt-5">Ładowanie Aplikacji</h3>
-      </div>
-    </div>
-  </div>
-</ng-template>
