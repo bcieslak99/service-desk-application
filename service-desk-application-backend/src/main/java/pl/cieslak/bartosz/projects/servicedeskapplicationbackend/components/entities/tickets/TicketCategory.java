@@ -43,6 +43,10 @@ public class TicketCategory
     @Column(nullable = false)
     private boolean categoryIsActive;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TicketType ticketType;
+
     @OneToMany(mappedBy = "category")
     private List<Ticket> tickets = new ArrayList<>();
 

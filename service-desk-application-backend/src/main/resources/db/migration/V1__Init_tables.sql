@@ -50,9 +50,16 @@ create table tickets_categories
     description varchar(2000),
     category_is_active boolean not null,
     default_group uuid not null,
+    ticket_type varchar(100) not null,
     primary key (id),
     foreign key (default_group) references support_groups(id)
 );
+
+insert into tickets_categories (id, name, description, category_is_active, default_group, ticket_type)
+VALUES
+    ('16efd80b-0da5-4481-a55c-2caa39b18884', 'Nieprawidłowe działanie VPN', 'Kategoria obejmuje problemy z logowaniem, spowolnionym działaniem itp.', true, 'f84267a2-40ff-4b4b-b0b7-92b811b1a936', 'INCIDENT'),
+    ('b91244cc-29f0-492b-8b27-02f1083af5ab', 'Poczta - problem z odbieraniem/wysyłaniem wiadomości', 'Kategoria dotyczy problemów z odbieraniem i wysyłaniem wiadomości.', true, '5bc2eb58-e2a1-4178-a440-7e52eaa07249', 'INCIDENT'),
+    ('04221533-e375-41c8-b2ca-6bf020300ce6', 'Podłączenie urządzenia wielofunkcyjnego.', 'Wniosek o usługę - podłączenie urządzenia wielofunkcyjnego.', true, '624efe20-bc19-4383-b514-a9706dba47e0', 'SERVICE_REQUEST');
 
 create table tickets
 (

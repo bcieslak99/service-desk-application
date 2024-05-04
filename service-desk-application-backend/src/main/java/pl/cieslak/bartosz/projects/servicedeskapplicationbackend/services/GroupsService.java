@@ -59,6 +59,12 @@ public class GroupsService
         return group;
     }
 
+    public Optional<SupportGroup> getGroupById(UUID groupId)
+    {
+        if(groupId == null) return Optional.empty();
+        return this.GROUP_REPOSITORY.findById(groupId);
+    }
+
     public ResponseEntity<List<GroupDetailsDTO>> getActiveGroups()
     {
         List<SupportGroup> groups = this.GROUP_REPOSITORY.getActiveGroups();
