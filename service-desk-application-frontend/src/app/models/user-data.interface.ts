@@ -1,4 +1,4 @@
-export interface UserData
+export interface UserCredentials
 {
   mail: string,
   password: string
@@ -23,4 +23,14 @@ export interface AuthData
     expiration: string
   },
   roles: string[]
+}
+
+export interface UserAsListElement
+{
+  userId: string,
+  name: string,
+  surname: string,
+  mail: string,
+  phoneNumber: string,
+  userActive: boolean
 }

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ApplicationSettings} from "../application-settings";
 import {BehaviorSubject, Observable} from "rxjs";
-import {AuthData, JWTToken, UserData} from "../models/user-data.interface";
+import {AuthData, JWTToken, UserCredentials} from "../models/user-data.interface";
 import {NotifierService} from "angular-notifier";
 import {Router, UrlTree} from "@angular/router";
 
@@ -21,7 +21,7 @@ export class AuthService
     return this.showLogoutButton;
   }
 
-  private getToken(userData: UserData): Observable<AuthData>
+  private getToken(userData: UserCredentials): Observable<AuthData>
   {
     return this.http.post<AuthData>(ApplicationSettings.apiUrl + "/api/v1/auth/login", userData);
   }
@@ -40,7 +40,7 @@ export class AuthService
     return this.router.createUrlTree(['/auth/login']);
   }
 
-  loginUser(userData: UserData,)
+  loginUser(userData: UserCredentials,)
   {
     this.getToken(userData).subscribe({
       next: value => {
@@ -90,6 +90,7 @@ export class AuthService
         error: err => {
           localStorage.removeItem("userLogged");
           this.userLogged = null;
+          this.router.navigate(["/"]);
         }
       })
     }
