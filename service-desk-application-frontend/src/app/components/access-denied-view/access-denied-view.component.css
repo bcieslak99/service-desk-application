@@ -1,0 +1,28 @@
+.access-information
+{
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.header
+{
+  color: #F44336;
+  font-weight: 600;
+  font-size: 30px;
+}
+
+.information
+{
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.logout-button
+{
+  width: 40%;
+  max-width: 500px;
+  min-width: 300px;
+  font-size: 18px;
+}
