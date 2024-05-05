@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'app-navbar',
@@ -10,7 +11,7 @@ export class NavbarComponent
 {
   constructor(private auth: AuthService) {}
 
-  userIsLogged(): boolean
+  userIsLogged(): BehaviorSubject<boolean>
   {
     return this.auth.userIsLogged();
   }

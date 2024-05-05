@@ -1,5 +1,5 @@
 <mat-toolbar color="primary">
   <span>Service Desk</span>
   <span class="spacer"></span>
-  <button *ngIf="userIsLogged()" mat-flat-button color="primary" type="button" class="text-end" (click)="logout()">Wyloguj</button>
+  <button *ngIf="userIsLogged() | async" mat-flat-button color="primary" type="button" class="text-end" (click)="logout()">Wyloguj</button>
 </mat-toolbar>

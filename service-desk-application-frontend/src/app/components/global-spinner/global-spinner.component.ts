@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {GlobalSpinnerService} from "../../services/global-spinner.service";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'app-global-spinner',
@@ -8,7 +9,7 @@ import {GlobalSpinnerService} from "../../services/global-spinner.service";
 })
 export class GlobalSpinnerComponent
 {
-  isLoading = this.spinnerService.isLoading;
+  isLoading: BehaviorSubject<boolean> = this.spinnerService.isLoading;
 
   constructor(private spinnerService: GlobalSpinnerService) {}
 }

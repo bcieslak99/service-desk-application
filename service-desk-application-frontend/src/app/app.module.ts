@@ -15,6 +15,7 @@ import { GlobalSpinnerComponent } from './components/global-spinner/global-spinn
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {GlobalSpinnerInterceptor} from "./guards_and_interceptors/global-spinner.interceptor";
 import {AuthorizationInterceptor} from "./guards_and_interceptors/authorization.interceptor";
+import { AccessDeniedViewComponent } from './components/access-denied-view/access-denied-view.component';
 
 const notifierConfig: NotifierOptions = {
   theme: "material"
@@ -24,7 +25,8 @@ const notifierConfig: NotifierOptions = {
   declarations: [
     AppComponent,
     NavbarComponent,
-    GlobalSpinnerComponent
+    GlobalSpinnerComponent,
+    AccessDeniedViewComponent
   ],
   imports: [
     BrowserModule,

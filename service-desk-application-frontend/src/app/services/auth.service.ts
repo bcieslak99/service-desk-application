@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ApplicationSettings} from "../application-settings";
-import {Observable} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
 import {AuthData, JWTToken, UserData} from "../models/user-data.interface";
 import {NotifierService} from "angular-notifier";
 import {Router, UrlTree} from "@angular/router";
@@ -12,12 +12,13 @@ import {Router, UrlTree} from "@angular/router";
 export class AuthService
 {
   userLogged: AuthData | null = null;
+  showLogoutButton: BehaviorSubject<boolean> =  new BehaviorSubject<boolean>(false);
 
   constructor(private http: HttpClient, private notifier: NotifierService, private router: Router) {}
 
-  userIsLogged(): boolean
+  userIsLogged(): BehaviorSubject<boolean>
   {
-    return this.userLogged !== null;
+    return this.showLogoutButton;
   }
 
   private getToken(userData: UserData): Observable<AuthData>
@@ -27,13 +28,16 @@ export class AuthService
 
   redirectUser(): UrlTree
   {
-    if(this.userLogged !== null)
-    {
-      if(this.userLogged?.roles.filter(element => element === "EMPLOYEE").length > 0)
-        return this.router.createUrlTree(["/employee/panel"]);
-    }
+    if(this.userLogged === null) return this.router.createUrlTree(['/auth/login'])
 
-    return this.router.createUrlTree(["/auth/login"])
+    if(this.userLogged.roles.filter(element => element === "SYSTEM_ADMINISTRATOR").length > 0)
+      return this.router.createUrlTree(["/administrator/panel"])
+    else if(this.userLogged.roles.filter(element => element === "FIRST_LINE_ANALYST" || element === "SECOND_LINE_ANALYST").length > 0)
+      return this.router.createUrlTree(["/employee/panel"]);
+    else if(this.userLogged.roles.filter(element => element === "EMPLOYEE").length > 0)
+      return this.router.createUrlTree(["/employee/panel"]);
+
+    return this.router.createUrlTree(['/auth/login']);
   }
 
   loginUser(userData: UserData,)
@@ -42,7 +46,8 @@ export class AuthService
       next: value => {
         this.userLogged = value;
         localStorage.setItem("userLogged", JSON.stringify(value));
-        this.router.navigateByUrl(this.redirectUser())
+        this.router.navigateByUrl(this.redirectUser());
+        this.showLogoutButton.next(true);
       },
       error: err => {
         if(err.error.message !== null && err.error.message instanceof String && err.error.message.trim().length > 0) this.notifier.notify("error", err.error.message);
@@ -56,7 +61,8 @@ export class AuthService
   {
     this.userLogged = null;
     localStorage.removeItem("userLogged");
-    this.router.navigate(['/']);
+    this.router.navigateByUrl(this.redirectUser());
+    this.showLogoutButton.next(false);
   }
 
   private refreshToken(authData: JWTToken): Observable<AuthData>
@@ -79,7 +85,7 @@ export class AuthService
         next: value => {
           this.userLogged = value;
           localStorage.setItem("userLogged", JSON.stringify(value));
-          this.router.navigateByUrl(this.redirectUser())
+          this.showLogoutButton.next(true);
         },
         error: err => {
           localStorage.removeItem("userLogged");
@@ -87,5 +93,11 @@ export class AuthService
         }
       })
     }
+  }
+
+  userIsAdministrator(): boolean
+  {
+    if(this.userLogged === null) return false;
+    return this.userLogged.roles.filter(element=> element === "SYSTEM_ADMINISTRATOR").length > 0;
   }
 }

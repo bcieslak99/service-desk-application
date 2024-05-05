@@ -6,7 +6,7 @@ import {BehaviorSubject} from "rxjs";
 })
 export class GlobalSpinnerService
 {
-  isLoading = new BehaviorSubject<boolean>(false);
+  isLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   showSpinner(): void
   {
