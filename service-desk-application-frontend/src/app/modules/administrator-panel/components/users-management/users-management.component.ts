@@ -1,12 +1,14 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {UserAsListElement} from "../../../../models/user-data.interface";
+import {UserAsListElement} from "../../../../models/user-data.interfaces";
 import {ApplicationSettings} from "../../../../application-settings";
 import {NotifierService} from "angular-notifier";
 import {Observable} from "rxjs";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
+import {MatDialog} from "@angular/material/dialog";
+import {NewUserDialogComponent} from "../dialogs/new-user-dialog/new-user-dialog.component";
 
 @Component({
   selector: 'app-users-management',
@@ -16,13 +18,13 @@ import {MatSort} from "@angular/material/sort";
 export class UsersManagementComponent implements AfterViewInit
 {
   filter: string = "";
-  displayedColumns: string[] = ["Nazwisko", "Imię", "E-mail", "Czy aktywny", "Akcje"];
+  displayedColumns: string[] = ["surname", "name", "mail", "userActive", "activities"];
   listOfUsers: MatTableDataSource<UserAsListElement> = new MatTableDataSource<UserAsListElement>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private http: HttpClient, private notifier: NotifierService) {}
+  constructor(private http: HttpClient, private notifier: NotifierService, private dialog: MatDialog) {}
 
   private getUsersList(): Observable<UserAsListElement[]>
   {
@@ -76,9 +78,17 @@ export class UsersManagementComponent implements AfterViewInit
   {
     const filterValue = (event.target as HTMLInputElement).value;
     this.listOfUsers.filter = filterValue.trim().toLowerCase();
+
     if (this.listOfUsers.paginator)
-    {
       this.listOfUsers.paginator.firstPage();
-    }
+  }
+
+  openDialogForNewUser()
+  {
+    const newUserDialog = this.dialog.open(NewUserDialogComponent);
+
+    newUserDialog.afterClosed().subscribe(result => {
+      if(result) this.loadUsers();
+    })
   }
 }

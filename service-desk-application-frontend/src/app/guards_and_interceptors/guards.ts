@@ -1,7 +1,7 @@
 import {ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot} from "@angular/router";
 import {inject} from "@angular/core";
 import {AuthService} from "../services/auth.service";
-import {AuthData} from "../models/user-data.interface";
+import {AuthData} from "../models/user-data.interfaces";
 
 export const userIsLoggedInGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
   const userData: AuthData | null = inject(AuthService).userLogged;

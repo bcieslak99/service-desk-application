@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ApplicationSettings} from "../application-settings";
 import {BehaviorSubject, Observable} from "rxjs";
-import {AuthData, JWTToken, UserCredentials} from "../models/user-data.interface";
+import {AuthData, JWTToken, UserCredentials} from "../models/user-data.interfaces";
 import {NotifierService} from "angular-notifier";
 import {Router, UrlTree} from "@angular/router";
 

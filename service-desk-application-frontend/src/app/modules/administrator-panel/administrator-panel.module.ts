@@ -10,9 +10,11 @@ import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatButtonModule} from "@angular/material/button";
 import {MatInputModule} from "@angular/material/input";
 import {MatIconModule} from "@angular/material/icon";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatMenuModule} from "@angular/material/menu";
 import { NewUserDialogComponent } from './components/dialogs/new-user-dialog/new-user-dialog.component';
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 @NgModule({
   declarations: [
@@ -31,7 +33,10 @@ import { NewUserDialogComponent } from './components/dialogs/new-user-dialog/new
     MatInputModule,
     MatIconModule,
     FormsModule,
-    MatMenuModule
+    MatMenuModule,
+    MatDialogModule,
+    ReactiveFormsModule,
+    MatCheckboxModule
   ]
 })
 export class AdministratorPanelModule { }

@@ -34,3 +34,15 @@ export interface UserAsListElement
   phoneNumber: string,
   userActive: boolean
 }
+
+export interface NewUser
+{
+  name: string,
+  surname: string,
+  mail: string,
+  active: boolean,
+  password: string,
+  administrator: boolean,
+  accessAsEmployeeIsPermitted: boolean,
+  phoneNumber: string | null
+}
