@@ -9,11 +9,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.AuthRequest;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.JWTToken;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.NewPassword;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.NewUserDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.jwt.AuthService;
+
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,5 +77,16 @@ public class AuthController
     public ResponseEntity<?> refreshToken(@RequestBody JWTToken authData)
     {
         return this.AUTH_SERVICE.refreshToken(authData);
+    }
+
+    @PostMapping("/password/change/{id}")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<ResponseMessage> changePassword(@PathVariable("id") UUID userId, @Valid @RequestBody NewPassword
+            password, BindingResult errors)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Nowe hasło jest nieprawidłowe!", ResponseCode.ERROR));
+
+        return this.AUTH_SERVICE.changeUSerPassword(userId, password.getPassword());
     }
 }

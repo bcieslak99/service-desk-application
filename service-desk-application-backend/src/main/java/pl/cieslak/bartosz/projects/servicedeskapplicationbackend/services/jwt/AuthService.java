@@ -17,6 +17,8 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.NewUserDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.IncorrectPasswordException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.user.UserRepository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
@@ -193,6 +195,34 @@ public class AuthService
         {
             TokenValidationResponse response = new TokenValidationResponse(TOKEN_IS_INACTIVE_MESSAGE, TokenStatus.INACTIVE);
             return ResponseEntity.ok(response);
+        }
+    }
+
+    public ResponseEntity<ResponseMessage> changeUSerPassword(UUID userId, String password)
+    {
+        try
+        {
+            Optional<User> userInDataBase = this.USER_REPOSITORY.getUserById(userId);
+
+            if(userInDataBase.isEmpty())
+                throw new UserNotFoundException("Nie odnaleziono wskazanego użytkownika!");
+
+            if(password == null || password.trim().isEmpty())
+                throw new IncorrectPasswordException("Nowe hasło nie spełnia wymagań!");
+
+            User user = userInDataBase.get();
+            user.setPassword(this.PASSWORD_ENCODER.encode(password));
+            this.USER_REPOSITORY.saveAndFlush(user);
+
+            return ResponseEntity.ok(new ResponseMessage("Hasło zostało zmienione.", ResponseCode.SUCCESS));
+        }
+        catch(UserNotFoundException | IncorrectPasswordException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
         }
     }
 }
