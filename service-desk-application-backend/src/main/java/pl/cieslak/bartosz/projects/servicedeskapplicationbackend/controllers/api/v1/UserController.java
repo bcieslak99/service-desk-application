@@ -30,6 +30,13 @@ public class UserController
         return ResponseEntity.ok(this.USER_SERVICE.getAllUsers());
     }
 
+    @GetMapping("/details/{id}")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<?> getUserDetails(@PathVariable("id") UUID userId)
+    {
+        return this.USER_SERVICE.getUserDetails(userId);
+    }
+
     @PatchMapping("/edit/{id}")
     @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
     public ResponseEntity<ResponseMessage> editUserData(@PathVariable("id") UUID userId,

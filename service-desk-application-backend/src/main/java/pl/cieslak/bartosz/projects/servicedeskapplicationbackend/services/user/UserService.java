@@ -131,4 +131,37 @@ public class UserService
                             ResponseCode.ERROR));
         }
     }
+
+    public ResponseEntity<?> getUserDetails(UUID userId)
+    {
+        try
+        {
+            Optional<User> userInDatabase = this.USER_REPOSITORY.findById(userId);
+
+            if(userInDatabase.isEmpty())
+                throw new UserNotFoundException("Nie odnaleziono wskazanego użytkownika!");
+
+            User user = userInDatabase.get();
+            UserNewDataDTO details = UserNewDataDTO
+                    .builder()
+                    .name(user.getName())
+                    .surname(user.getSurname())
+                    .mail(user.getMail())
+                    .active(user.isActive())
+                    .administrator(user.isAdministrator())
+                    .accessAsEmployeeIsPermitted(user.isAccessAsEmployeeIsPermitted())
+                    .phoneNumber(user.getPhoneNumber())
+                    .build();
+
+            return ResponseEntity.ok(details);
+        }
+        catch(UserNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
+        }
+    }
 }
