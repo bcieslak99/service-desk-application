@@ -51,8 +51,8 @@
                   <mat-icon>contact_page</mat-icon>
                   <span>Modyfikacja danych</span>
                 </button>
-                <button mat-menu-item>
-                  <mat-icon>key</mat-icon>
+                <button mat-menu-item (click)="openDialogForChangePassword(row)">
+                  <mat-icon>password</mat-icon>
                   <span>Zmiana hasła</span>
                 </button>
               </mat-menu>

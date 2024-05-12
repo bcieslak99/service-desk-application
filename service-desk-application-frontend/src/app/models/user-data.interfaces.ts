@@ -46,3 +46,8 @@ export interface NewUser
   accessAsEmployeeIsPermitted: boolean,
   phoneNumber: string | null
 }
+
+export interface NewPassword
+{
+  password: string
+}

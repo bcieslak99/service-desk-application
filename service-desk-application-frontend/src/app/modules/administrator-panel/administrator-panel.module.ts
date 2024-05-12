@@ -15,12 +15,14 @@ import {MatMenuModule} from "@angular/material/menu";
 import { NewUserDialogComponent } from './components/dialogs/new-user-dialog/new-user-dialog.component';
 import {MatDialogModule} from "@angular/material/dialog";
 import {MatCheckboxModule} from "@angular/material/checkbox";
+import { ChangePasswordDialogComponent } from './components/dialogs/change-password-dialog/change-password-dialog.component';
 
 @NgModule({
   declarations: [
     AdministratorPanelComponent,
     UsersManagementComponent,
-    NewUserDialogComponent
+    NewUserDialogComponent,
+    ChangePasswordDialogComponent
   ],
   imports: [
     CommonModule,

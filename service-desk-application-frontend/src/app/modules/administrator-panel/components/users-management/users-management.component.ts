@@ -9,6 +9,7 @@ import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {MatDialog} from "@angular/material/dialog";
 import {NewUserDialogComponent} from "../dialogs/new-user-dialog/new-user-dialog.component";
+import {ChangePasswordDialogComponent} from "../dialogs/change-password-dialog/change-password-dialog.component";
 
 @Component({
   selector: 'app-users-management',
@@ -89,6 +90,15 @@ export class UsersManagementComponent implements AfterViewInit
 
     newUserDialog.afterClosed().subscribe(result => {
       if(result) this.loadUsers();
+    })
+  }
+
+  openDialogForChangePassword(userData: UserAsListElement)
+  {
+    const dialogForChangePassword = this.dialog.open(ChangePasswordDialogComponent, {
+      data: {
+        userData: userData,
+      }
     })
   }
 }
