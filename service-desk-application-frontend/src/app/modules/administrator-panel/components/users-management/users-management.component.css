@@ -1,0 +1,19 @@
+.status
+{
+  font-weight: 600;
+}
+
+.active-user
+{
+  color: limegreen;
+}
+
+.no-active-user
+{
+  color: orangered;
+}
+
+.filter-input
+{
+  width: 100%;
+}

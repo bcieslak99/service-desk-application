@@ -19,6 +19,6 @@ interface UserSQLRepository extends JpaRepository<User, UUID>, UserRepository
     @Query("select u from User as u left join fetch u.userGroups as ug where u.id = :id")
     Optional<User> getUserById(@Param("id") UUID userId);
 
-    @Query("select u from User as u order by u.surname, u.name, u.mail")
+    @Query("select u from User as u order by u.active desc, u.surname, u.name, u.mail")
     List<User> getAllUsers();
 }

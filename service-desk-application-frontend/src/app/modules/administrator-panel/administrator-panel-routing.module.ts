@@ -11,7 +11,8 @@ const routes: Routes = [
   {
     path: "panel",
     pathMatch: "full",
-    component: AdministratorPanelComponent
+    component: AdministratorPanelComponent,
+    title: "Service Desk :: Panel Administratora"
   },
   {
     path: "**",

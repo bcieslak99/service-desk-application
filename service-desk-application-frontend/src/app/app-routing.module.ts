@@ -39,7 +39,8 @@ const routes: Routes = [
     path: "access/denied",
     pathMatch: "full",
     component: AccessDeniedViewComponent,
-    canActivate: [userHasNotPermissions]
+    canActivate: [userHasNotPermissions],
+    title: "Service Desk :: Brak uprawnień"
   },
   {
     path: "**",
