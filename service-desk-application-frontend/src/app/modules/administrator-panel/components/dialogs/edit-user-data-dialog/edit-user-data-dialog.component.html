@@ -1,0 +1,78 @@
+<h2 mat-dialog-title>Dodawanie nowego użytkownika</h2>
+<mat-dialog-content class="mat-typography">
+  <form [formGroup]="userDataForm" (ngSubmit)="editData()">
+    <div class="container-fluid">
+
+      <hr>
+
+      <div class="row justify-content-center text-center">
+        <mat-form-field>
+          <mat-label>Nazwisko</mat-label>
+          <input matInput formControlName="surname">
+          <mat-error
+            *ngIf="userDataForm.controls['surname'].invalid &&
+            userDataForm.controls['surname'].touched &&
+            getErrorSurnameMessage() !== null">
+            {{getErrorSurnameMessage()}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row justify-content-center text-center">
+        <mat-form-field>
+          <mat-label>Imię</mat-label>
+          <input matInput formControlName="name">
+          <mat-error
+            *ngIf="userDataForm.controls['name'].invalid &&
+            userDataForm.controls['name'].touched &&
+            getErrorNameMessage() !== null">
+            {{getErrorNameMessage()}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <hr>
+
+      <div class="row justify-content-center text-center">
+        <mat-form-field>
+          <mat-label>E-mail</mat-label>
+          <input matInput formControlName="mail">
+          <mat-error
+            *ngIf="userDataForm.controls['mail'].invalid &&
+            userDataForm.controls['mail'].touched &&
+            getErrorMailMessage() !== null">
+            {{getErrorMailMessage()}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row justify-content-center text-center">
+        <mat-form-field>
+          <mat-label>Numer telefonu</mat-label>
+          <input matInput formControlName="phoneNumber">
+          <mat-error
+            *ngIf="userDataForm.controls['phoneNumber'].invalid &&
+            userDataForm.controls['phoneNumber'].touched &&
+            getErrorPhoneNumberMessage() !== null">
+            {{getErrorPhoneNumberMessage()}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <hr>
+
+      <div class="row justify-content-center">
+        <mat-checkbox color="primary" formControlName="userActive">Użytkownik będzie aktywny po rejestracji</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="administrator">Użytkownik jest administratorem systemu</mat-checkbox>
+        <mat-checkbox color="primary" formControlName="accessAsEmployee">Użytkownik posiada dostęp jako pracownik</mat-checkbox>
+      </div>
+
+      <hr>
+
+      <div class="my-3 text-end">
+        <button mat-raised-button color="warn" type="button" (click)="closeDialog(false)"><mat-icon>block</mat-icon> Anuluj edycję</button>
+        <button mat-raised-button color="primary" type="submit" class="ms-3" [disabled]="!dataIsCorrect()"><mat-icon>edit</mat-icon> Zapisz zmiany</button>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>

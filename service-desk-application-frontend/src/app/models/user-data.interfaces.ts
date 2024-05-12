@@ -47,6 +47,17 @@ export interface NewUser
   phoneNumber: string | null
 }
 
+export interface NewUserData
+{
+  name: string,
+  surname: string,
+  mail: string,
+  active: boolean,
+  administrator: boolean,
+  accessAsEmployeeIsPermitted: boolean,
+  phoneNumber: string | null
+}
+
 export interface NewPassword
 {
   password: string

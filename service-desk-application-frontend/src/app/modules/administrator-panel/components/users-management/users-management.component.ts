@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {UserAsListElement} from "../../../../models/user-data.interfaces";
+import {NewUser, UserAsListElement} from "../../../../models/user-data.interfaces";
 import {ApplicationSettings} from "../../../../application-settings";
 import {NotifierService} from "angular-notifier";
 import {Observable} from "rxjs";
@@ -10,6 +10,7 @@ import {MatSort} from "@angular/material/sort";
 import {MatDialog} from "@angular/material/dialog";
 import {NewUserDialogComponent} from "../dialogs/new-user-dialog/new-user-dialog.component";
 import {ChangePasswordDialogComponent} from "../dialogs/change-password-dialog/change-password-dialog.component";
+import {EditUserDataDialogComponent} from "../dialogs/edit-user-data-dialog/edit-user-data-dialog.component";
 
 @Component({
   selector: 'app-users-management',
@@ -100,5 +101,18 @@ export class UsersManagementComponent implements AfterViewInit
         userData: userData,
       }
     })
+  }
+
+  openDialogForEditUserData(userId: string)
+  {
+    const dialogForEditUserData = this.dialog.open(EditUserDataDialogComponent, {
+      data: {
+        userId: userId
+      }
+    });
+
+    dialogForEditUserData.afterClosed().subscribe(result => {
+      if(result) this.loadUsers();
+    });
   }
 }
