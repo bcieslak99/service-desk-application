@@ -1,11 +1,23 @@
 <mat-tab-group>
-  <mat-tab label="Użytkownicy">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>person</mat-icon>
+      Użytkownicy
+    </ng-template>
     <app-users-management></app-users-management>
   </mat-tab>
-  <mat-tab label="Grupy wsparcia">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>groups</mat-icon>
+      Grupy wsparcia
+    </ng-template>
     Zarządzanie grupami wsparcia
   </mat-tab>
-  <mat-tab label="Kategorie">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon>category</mat-icon>
+      Kategorie
+    </ng-template>
     Zarządzanie kategoriami
   </mat-tab>
 </mat-tab-group>
