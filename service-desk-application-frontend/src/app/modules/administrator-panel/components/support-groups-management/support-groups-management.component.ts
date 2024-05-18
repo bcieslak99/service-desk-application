@@ -8,6 +8,7 @@ import {ApplicationSettings} from "../../../../application-settings";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
+import {NewGroupDialogComponent} from "../dialogs/new-group-dialog/new-group-dialog.component";
 
 @Component({
   selector: 'app-support-groups-management',
@@ -80,5 +81,14 @@ export class SupportGroupsManagementComponent implements AfterViewInit
   ngAfterViewInit(): void
   {
     this.loadGroups();
+  }
+
+  openDialogToCreateNewGroup()
+  {
+    const newGroupDialog = this.dialog.open(NewGroupDialogComponent);
+
+    newGroupDialog.afterClosed().subscribe(result => {
+      if(result) this.loadGroups();
+    })
   }
 }

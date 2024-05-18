@@ -18,6 +18,8 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 import { ChangePasswordDialogComponent } from './components/dialogs/change-password-dialog/change-password-dialog.component';
 import { EditUserDataDialogComponent } from './components/dialogs/edit-user-data-dialog/edit-user-data-dialog.component';
 import { SupportGroupsManagementComponent } from './components/support-groups-management/support-groups-management.component';
+import { NewGroupDialogComponent } from './components/dialogs/new-group-dialog/new-group-dialog.component';
+import {MatSelectModule} from "@angular/material/select";
 
 @NgModule({
   declarations: [
@@ -26,7 +28,8 @@ import { SupportGroupsManagementComponent } from './components/support-groups-ma
     NewUserDialogComponent,
     ChangePasswordDialogComponent,
     EditUserDataDialogComponent,
-    SupportGroupsManagementComponent
+    SupportGroupsManagementComponent,
+    NewGroupDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -42,7 +45,8 @@ import { SupportGroupsManagementComponent } from './components/support-groups-ma
     MatMenuModule,
     MatDialogModule,
     ReactiveFormsModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatSelectModule
   ]
 })
 export class AdministratorPanelModule { }

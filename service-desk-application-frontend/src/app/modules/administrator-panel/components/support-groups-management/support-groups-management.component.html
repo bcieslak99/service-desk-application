@@ -2,7 +2,7 @@
   <div class="row justify-content-center">
     <div class="col-12 col-md-10 col-lg-8">
       <div class="text-end mb-4">
-        <button mat-raised-button color="primary">
+        <button mat-raised-button color="primary" (click)="openDialogToCreateNewGroup()">
           <mat-icon>group_add</mat-icon>
           <span>Dodaj nową grupę</span>
         </button>
@@ -56,6 +56,10 @@
                 <button mat-menu-item>
                   <mat-icon>group</mat-icon>
                   <span>Zarządzanie członkami</span>
+                </button>
+                <button mat-menu-item>
+                  <mat-icon>assignment_ind</mat-icon>
+                  <span>Ustal kierownika grupy</span>
                 </button>
               </mat-menu>
             </td>

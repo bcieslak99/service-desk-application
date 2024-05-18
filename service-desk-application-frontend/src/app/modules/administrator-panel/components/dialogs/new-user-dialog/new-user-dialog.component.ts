@@ -41,7 +41,7 @@ export class NewUserDialogComponent
       else if(surnameControl.hasError("minlength"))
         return "Nazwisko musi się składać z minimum 2 znaków!";
       else if(surnameControl.hasError("maxlength"))
-        return "Nazwisko musi się składać maksymalnie z 150 znaków!";
+        return "Nazwisko może się składać maksymalnie z 150 znaków!";
       else return "Nieznany błąd!";
     }
 

@@ -5,5 +5,23 @@ export interface GroupData
   description: string,
   groupType: string,
   groupActive: boolean,
-  manager: string | null
+  manager: ManagerData | null
+}
+
+export interface ManagerData
+{
+  name: string,
+  surname: string,
+  mail: string,
+  phoneNumber: string | null,
+  userActive: boolean
+}
+
+export interface NewGroupData
+{
+  name: string,
+  description: string,
+  groupType: string,
+  groupActive: boolean,
+  managerId: string | null
 }

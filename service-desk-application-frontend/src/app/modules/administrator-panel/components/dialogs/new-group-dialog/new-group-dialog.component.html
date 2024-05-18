@@ -1,0 +1,60 @@
+<h2 mat-dialog-title>Dodawanie nowego użytkownika</h2>
+<mat-dialog-content class="mat-typography">
+  <form [formGroup]="newGroupForm" (ngSubmit)="createGroup()">
+    <div class="container-fluid">
+
+      <hr>
+
+      <div class="row justify-content-center text-center">
+        <mat-form-field>
+          <mat-label>Nazwa grupy</mat-label>
+          <input matInput formControlName="name">
+          <mat-error
+            *ngIf="newGroupForm.controls['name'].invalid &&
+            newGroupForm.controls['name'].touched &&
+            getErrorNameMessage() !== null">
+            {{getErrorNameMessage()}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row justify-content-center text-center">
+        <mat-form-field>
+          <mat-label>Opis grupy</mat-label>
+          <textarea matInput formControlName="description">Podaj opis grupy</textarea>
+          <mat-error
+            *ngIf="newGroupForm.controls['description'].invalid &&
+            newGroupForm.controls['description'].touched &&
+            getErrorDescriptionMessage() !== null">
+            {{getErrorDescriptionMessage()}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row justify-content-center text-center">
+        <mat-form-field>
+          <mat-label>Typ grupy</mat-label>
+          <mat-select formControlName="groupType">
+            <mat-option value="FIRST_LINE">I Linia wsparcia</mat-option>
+            <mat-option value="SECOND_LINE">II Linia wsparcia</mat-option>
+          </mat-select>
+          <mat-error *ngIf="newGroupForm.controls['groupType'].invalid && getErrorGroupTypeMessage() !== null">
+            {{getErrorGroupTypeMessage()}}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="row justify-content-center">
+        <mat-checkbox color="primary" formControlName="groupActive">Grupa będzie aktywna po rejestracji</mat-checkbox>
+      </div>
+
+      <hr>
+
+      <div class="my-3 text-center">
+        <button mat-raised-button color="warn" type="button" class="mt-0" (click)="closeDialog()"><mat-icon>block</mat-icon> Anuluj dodawanie</button>
+        <button mat-raised-button color="primary" type="submit" class="ms-3 mt-3 mt-sm-0" [disabled]="!dataIsCorrect()"><mat-icon>group_add</mat-icon> Dodaj grupę</button>
+      </div>
+
+    </div>
+  </form>
+</mat-dialog-content>
