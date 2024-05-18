@@ -28,7 +28,7 @@ public class GroupController
     @PreAuthorize("hasAnyAuthority('SYSTEM_ADMINISTRATOR')")
     public ResponseEntity<List<GroupDetailsDTO>> showActiveGroups()
     {
-        return this.GROUP_SERVICE.getActiveGroups();
+        return this.GROUP_SERVICE.getAllGroups();
     }
 
     @PostMapping("/create")

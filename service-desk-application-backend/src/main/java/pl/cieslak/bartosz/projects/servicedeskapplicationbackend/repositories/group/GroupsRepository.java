@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface GroupsRepository
 {
     SupportGroup saveAndFlush(SupportGroup group);
-    List<SupportGroup> getActiveGroups();
+    List<SupportGroup> getAllGroups();
     Optional<SupportGroup> getSupportGroupByName(String name);
     Optional<SupportGroup> findById(UUID groupId);
     Optional<SupportGroup> getSupportGroupAndMembersById(UUID id);

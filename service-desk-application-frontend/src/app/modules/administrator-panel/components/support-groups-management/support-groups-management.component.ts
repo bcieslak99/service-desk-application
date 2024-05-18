@@ -9,6 +9,7 @@ import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {NewGroupDialogComponent} from "../dialogs/new-group-dialog/new-group-dialog.component";
+import {ServerResponsesMessage} from "../../../../models/server-responses.interfaces";
 
 @Component({
   selector: 'app-support-groups-management',
@@ -81,6 +82,34 @@ export class SupportGroupsManagementComponent implements AfterViewInit
   ngAfterViewInit(): void
   {
     this.loadGroups();
+  }
+
+  activateGroup(groupId: string): void
+  {
+    this.http.patch<ServerResponsesMessage>(ApplicationSettings.apiUrl + "/api/v1/group/activate/" + groupId, {}).subscribe({
+      next: value => {
+        this.loadGroups();
+        this.notifier.notify(value.code.toLowerCase(), value.message);
+      },
+      error: err => {
+        let result: ServerResponsesMessage = err.error as ServerResponsesMessage;
+        this.notifier.notify(result.code.toLowerCase(), result.message);
+      }
+    });
+  }
+
+  deactivateGroup(groupId: string): void
+  {
+    this.http.patch<ServerResponsesMessage>(ApplicationSettings.apiUrl + "/api/v1/group/deactivate/" + groupId, {}).subscribe({
+      next: value => {
+        this.loadGroups();
+        this.notifier.notify(value.code.toLowerCase(), value.message);
+      },
+      error: err => {
+        let result: ServerResponsesMessage = err.error as ServerResponsesMessage;
+        this.notifier.notify(result.code.toLowerCase(), result.message);
+      }
+    });
   }
 
   openDialogToCreateNewGroup()

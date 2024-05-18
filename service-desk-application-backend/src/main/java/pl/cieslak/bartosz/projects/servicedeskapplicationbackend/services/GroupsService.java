@@ -65,9 +65,9 @@ public class GroupsService
         return this.GROUP_REPOSITORY.findById(groupId);
     }
 
-    public ResponseEntity<List<GroupDetailsDTO>> getActiveGroups()
+    public ResponseEntity<List<GroupDetailsDTO>> getAllGroups()
     {
-        List<SupportGroup> groups = this.GROUP_REPOSITORY.getActiveGroups();
+        List<SupportGroup> groups = this.GROUP_REPOSITORY.getAllGroups();
         List<GroupDetailsDTO> groupsToShow = new ArrayList<>();
 
         for(SupportGroup element : groups)
