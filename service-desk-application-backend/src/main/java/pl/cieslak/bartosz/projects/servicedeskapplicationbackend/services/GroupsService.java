@@ -357,4 +357,41 @@ public class GroupsService
                     .body(new ResponseMessage("Napotkano nieoczekiwany błąd serwera!", ResponseCode.ERROR));
         }
     }
+
+    public ResponseEntity<ResponseMessage> changeGroupManager(UUID groupId, UUID managerId)
+    {
+        try
+        {
+            Optional<SupportGroup> groupInDatabase = this.GROUP_REPOSITORY.getSupportGroupAndManagerById(groupId);
+            if(groupInDatabase.isEmpty())
+                throw new GroupNotFoundException("Nie odnaleziono wskazanej grupy!");
+
+            Optional<User> userInDatabase = Optional.empty();
+
+            if(managerId != null)
+                userInDatabase = this.USER_SERVICE.getUserById(managerId);
+
+            SupportGroup group = groupInDatabase.get();
+
+            if(userInDatabase.isEmpty())
+                group.setGroupManager(null);
+            else
+            {
+                User user = userInDatabase.get();
+                group.setGroupManager(user);
+            }
+
+            this.GROUP_REPOSITORY.saveAndFlush(group);
+
+            return ResponseEntity.ok(new ResponseMessage("Zmieniono ustawienia grupy.", ResponseCode.SUCCESS));
+        }
+        catch(GroupNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
+        }
+    }
 }

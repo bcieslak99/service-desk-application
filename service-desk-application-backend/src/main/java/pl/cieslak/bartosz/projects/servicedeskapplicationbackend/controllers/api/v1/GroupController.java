@@ -7,8 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupDetailsDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupMembersListDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.MemberID;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.UserId;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.NewGroupDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
@@ -76,7 +75,7 @@ public class GroupController
     @PostMapping("/member/add/{id}")
     @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
     public ResponseEntity<ResponseMessage> addMemberToGroup(@PathVariable("id") UUID groupId,
-                                                            @Valid @RequestBody MemberID memberId, BindingResult errors)
+                                                            @Valid @RequestBody UserId memberId, BindingResult errors)
     {
         if(groupId == null || errors.hasErrors())
             return ResponseEntity.badRequest().body(new ResponseMessage("Błąd! Podano nie prawidłowe dane!", ResponseCode.ERROR));
@@ -87,7 +86,7 @@ public class GroupController
     @DeleteMapping("/member/remove/{id}")
     @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
     public ResponseEntity<ResponseMessage> removeMemberToGroup(@PathVariable("id") UUID groupId,
-                                                            @Valid @RequestBody MemberID memberId, BindingResult errors)
+                                                               @Valid @RequestBody UserId memberId, BindingResult errors)
     {
         if(groupId == null || errors.hasErrors())
             return ResponseEntity.badRequest().body(new ResponseMessage("Błąd! Podano nie prawidłowe dane!", ResponseCode.ERROR));
@@ -100,5 +99,12 @@ public class GroupController
     public ResponseEntity<?> getMembersOfGroup(@PathVariable("id") UUID groupId)
     {
         return this.GROUP_SERVICE.getGroupMembers(groupId);
+    }
+
+    @PatchMapping("/manager/set/{id}")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<ResponseMessage> setManager(@PathVariable("id") UUID groupId, @RequestBody UserId managerId)
+    {
+        return this.GROUP_SERVICE.changeGroupManager(groupId, managerId.getUserId());
     }
 }

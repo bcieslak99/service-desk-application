@@ -13,4 +13,5 @@ public interface GroupsRepository
     Optional<SupportGroup> getSupportGroupByName(String name);
     Optional<SupportGroup> findById(UUID groupId);
     Optional<SupportGroup> getSupportGroupAndMembersById(UUID id);
+    Optional<SupportGroup> getSupportGroupAndManagerById(UUID groupId);
 }

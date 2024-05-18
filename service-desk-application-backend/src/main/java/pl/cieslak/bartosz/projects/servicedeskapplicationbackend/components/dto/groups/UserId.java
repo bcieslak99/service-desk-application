@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @Component
-public class MemberID
+public class UserId
 {
     @NotNull
     private UUID userId;
