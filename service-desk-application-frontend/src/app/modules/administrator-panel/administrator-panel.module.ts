@@ -17,6 +17,7 @@ import {MatDialogModule} from "@angular/material/dialog";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import { ChangePasswordDialogComponent } from './components/dialogs/change-password-dialog/change-password-dialog.component';
 import { EditUserDataDialogComponent } from './components/dialogs/edit-user-data-dialog/edit-user-data-dialog.component';
+import { SupportGroupsManagementComponent } from './components/support-groups-management/support-groups-management.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { EditUserDataDialogComponent } from './components/dialogs/edit-user-data
     UsersManagementComponent,
     NewUserDialogComponent,
     ChangePasswordDialogComponent,
-    EditUserDataDialogComponent
+    EditUserDataDialogComponent,
+    SupportGroupsManagementComponent
   ],
   imports: [
     CommonModule,

@@ -1,0 +1,19 @@
+.status
+{
+  font-weight: 600;
+}
+
+.active-group
+{
+  color: limegreen;
+}
+
+.no-active-group
+{
+  color: orangered;
+}
+
+.filter-input
+{
+  width: 100%;
+}

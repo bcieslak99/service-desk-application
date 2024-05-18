@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {NewUser, UserAsListElement} from "../../../../models/user-data.interfaces";
+import {UserAsListElement} from "../../../../models/user-data.interfaces";
 import {ApplicationSettings} from "../../../../application-settings";
 import {NotifierService} from "angular-notifier";
 import {Observable} from "rxjs";
