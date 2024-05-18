@@ -10,6 +10,7 @@ import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {NewGroupDialogComponent} from "../dialogs/new-group-dialog/new-group-dialog.component";
 import {ServerResponsesMessage} from "../../../../models/server-responses.interfaces";
+import {EditGroupDataDialogComponent} from "../dialogs/edit-group-data-dialog/edit-group-data-dialog.component";
 
 @Component({
   selector: 'app-support-groups-management',
@@ -119,5 +120,16 @@ export class SupportGroupsManagementComponent implements AfterViewInit
     newGroupDialog.afterClosed().subscribe(result => {
       if(result) this.loadGroups();
     })
+  }
+
+  openDialogToEditGroupData(groupData: GroupData): void
+  {
+    const editGroupDataDialog = this.dialog.open(EditGroupDataDialogComponent, {
+      data: groupData
+    });
+
+    editGroupDataDialog.afterClosed().subscribe(result => {
+      if(result) this.loadGroups();
+    });
   }
 }

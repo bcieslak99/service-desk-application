@@ -78,6 +78,32 @@ public class GroupsService
         return ResponseEntity.ok(groupsToShow);
     }
 
+    public ResponseEntity<?> getGroupDetails(UUID groupId)
+    {
+        final String ERROR_MESSAGE = "Nie odnaleziono wskazanej grupy!";
+
+        try
+        {
+            if(groupId == null)
+                throw new GroupNotFoundException(ERROR_MESSAGE);
+
+            Optional<SupportGroup> groupInDatabase = this.GROUP_REPOSITORY.getSupportGroupAndManagerById(groupId);
+            if(groupInDatabase.isEmpty())
+                throw new GroupNotFoundException(ERROR_MESSAGE);
+
+            return ResponseEntity.ok(prepareGroupAsListElement(groupInDatabase.get()));
+        }
+        catch (GroupNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!",
+                    ResponseCode.ERROR));
+        }
+    }
+
     public Optional<SupportGroup> getGroupAndMembersById(UUID groupId)
     {
         if(groupId == null) return Optional.empty();

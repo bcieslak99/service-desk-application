@@ -31,6 +31,13 @@ public class GroupController
         return this.GROUP_SERVICE.getAllGroups();
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<?> showGroupDetails(@PathVariable("id") UUID groupId)
+    {
+        return this.GROUP_SERVICE.getGroupDetails(groupId);
+    }
+
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
     public ResponseEntity<ResponseMessage> createGroup(@Valid @RequestBody NewGroupDTO groupData, BindingResult errors)

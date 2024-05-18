@@ -1,6 +1,6 @@
-<h2 mat-dialog-title class="text-center">Dodawanie nowego użytkownika</h2>
+<h2 mat-dialog-title class="text-center">Modyfikacja danych grupy: {{getGroupName()}}</h2>
 <mat-dialog-content class="mat-typography">
-  <form [formGroup]="newGroupForm" (ngSubmit)="createGroup()">
+  <form [formGroup]="groupDataForm" (ngSubmit)="editData()">
     <div class="container-fluid">
 
       <hr>
@@ -10,8 +10,8 @@
           <mat-label>Nazwa grupy</mat-label>
           <input matInput formControlName="name">
           <mat-error
-            *ngIf="newGroupForm.controls['name'].invalid &&
-            newGroupForm.controls['name'].touched &&
+            *ngIf="groupDataForm.controls['name'].invalid &&
+            groupDataForm.controls['name'].touched &&
             getErrorNameMessage() !== null">
             {{getErrorNameMessage()}}
           </mat-error>
@@ -23,8 +23,8 @@
           <mat-label>Opis grupy</mat-label>
           <textarea matInput formControlName="description">Podaj opis grupy</textarea>
           <mat-error
-            *ngIf="newGroupForm.controls['description'].invalid &&
-            newGroupForm.controls['description'].touched &&
+            *ngIf="groupDataForm.controls['description'].invalid &&
+            groupDataForm.controls['description'].touched &&
             getErrorDescriptionMessage() !== null">
             {{getErrorDescriptionMessage()}}
           </mat-error>
@@ -38,7 +38,7 @@
             <mat-option value="FIRST_LINE">I Linia wsparcia</mat-option>
             <mat-option value="SECOND_LINE">II Linia wsparcia</mat-option>
           </mat-select>
-          <mat-error *ngIf="newGroupForm.controls['groupType'].invalid && getErrorGroupTypeMessage() !== null">
+          <mat-error *ngIf="groupDataForm.controls['groupType'].invalid && getErrorGroupTypeMessage() !== null">
             {{getErrorGroupTypeMessage()}}
           </mat-error>
         </mat-form-field>
@@ -51,8 +51,8 @@
       <hr>
 
       <div class="my-3 text-center">
-        <button mat-raised-button color="warn" type="button" class="mt-0" (click)="closeDialog()"><mat-icon>block</mat-icon> Anuluj dodawanie</button>
-        <button mat-raised-button color="primary" type="submit" class="ms-3 mt-3 mt-sm-0" [disabled]="!dataIsCorrect()"><mat-icon>group_add</mat-icon> Dodaj grupę</button>
+        <button mat-raised-button color="warn" type="button" class="mt-0" (click)="closeDialog(false)"><mat-icon>block</mat-icon> Anuluj dodawanie</button>
+        <button mat-raised-button color="primary" type="submit" class="ms-3 mt-3 mt-sm-0" [disabled]="!dataIsCorrect()"><mat-icon>edit</mat-icon> Edytuj grupę</button>
       </div>
 
     </div>
