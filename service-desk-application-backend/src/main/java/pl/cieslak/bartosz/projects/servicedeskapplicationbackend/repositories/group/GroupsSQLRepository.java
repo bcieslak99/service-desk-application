@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +24,6 @@ interface GroupsSQLRepository extends JpaRepository<SupportGroup, UUID>, GroupsR
 
     @Query("select sg from SupportGroup as sg left join fetch sg.groupManager where sg.id = :id")
     Optional<SupportGroup> getSupportGroupAndManagerById(@Param("id") UUID groupId);
+    @Query("select u from User as u left join fetch u.userGroups as ug where ug.id = :groupId order by u.active desc, u.surname, u.name, u.mail")
+    List<User> getMembersFromGroup(@Param("groupId") UUID groupId);
 }

@@ -3,10 +3,7 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupDetailsDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupMemberDetailsDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupMembersListDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.NewGroupDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
@@ -17,6 +14,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exce
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.groups.GroupIncorrectDataException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.group.GroupsRepository;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.user.UserRepository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
 import java.util.*;
@@ -28,6 +26,7 @@ public class GroupsService
 {
     private final GroupsRepository GROUP_REPOSITORY;
     private final UserService USER_SERVICE;
+    private final UserRepository USER_REPOSITORY;
 
     public GroupDetailsDTO prepareGroupAsListElement(SupportGroup group)
     {
@@ -416,6 +415,68 @@ public class GroupsService
             return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
         }
         catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
+        }
+    }
+
+    private List<GroupMemberDetailsDTO> prepareGroupMembers(List<User> users)
+    {
+        List<GroupMemberDetailsDTO> members = new ArrayList<>();
+
+        for(User user : users)
+        {
+            GroupMemberDetailsDTO member = GroupMemberDetailsDTO.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .surname(user.getSurname())
+                    .mail(user.getMail())
+                    .phoneNumber(user.getPhoneNumber())
+                    .userActive(user.isActive())
+                    .build();
+
+            members.add(member);
+        }
+
+        return members;
+    }
+
+    private List<GroupMemberDetailsDTO> getCurrentMembers(UUID groupId)
+    {
+        List<User> usersInGroup = this.GROUP_REPOSITORY.getMembersFromGroup(groupId);
+        return prepareGroupMembers(usersInGroup);
+    }
+
+    private List<GroupMemberDetailsDTO> getUsersToAdd(UUID groupId)
+    {
+        List<User> usersInGroup = this.GROUP_REPOSITORY.getMembersFromGroup(groupId);
+        List<User> allUsers = this.USER_REPOSITORY.getAllUsers();
+
+        allUsers = allUsers.stream().filter(user -> user.isActive() && usersInGroup
+                .stream().noneMatch(element -> element.getId().equals(user.getId()))).collect(Collectors.toList());
+
+        return prepareGroupMembers(allUsers);
+    }
+
+    public ResponseEntity<?> getMembersToModify(UUID groupId)
+    {
+        try
+        {
+            if(groupId == null)
+                throw new GroupNotFoundException("Nie odnaleziono wskazanej grupy!");
+
+            MembersToModifyDTO membersToModify = new MembersToModifyDTO();
+
+            membersToModify.setAddedUsers(getCurrentMembers(groupId));
+            membersToModify.setOtherUsers(getUsersToAdd(groupId));
+
+            return ResponseEntity.ok(membersToModify);
+        }
+        catch (GroupNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch (Exception exception)
         {
             return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
         }

@@ -25,3 +25,30 @@ export interface NewGroupData
   groupActive: boolean,
   managerId: string | null
 }
+
+export interface Member
+{
+  id: string,
+  name: string,
+  surname: string,
+  mail: string,
+  phoneNumber: string | null,
+  userActive: boolean
+}
+
+export interface GroupMembers
+{
+  addedUsers: Member[],
+  otherUsers: Member[]
+}
+
+export interface MemberToModify
+{
+  id: string,
+  name: string,
+  surname: string,
+  mail: string,
+  phoneNumber: string | null,
+  userActive: boolean,
+  modify: string
+}

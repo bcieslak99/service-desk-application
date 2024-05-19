@@ -11,6 +11,9 @@ import {MatSort} from "@angular/material/sort";
 import {NewGroupDialogComponent} from "../dialogs/new-group-dialog/new-group-dialog.component";
 import {ServerResponsesMessage} from "../../../../models/server-responses.interfaces";
 import {EditGroupDataDialogComponent} from "../dialogs/edit-group-data-dialog/edit-group-data-dialog.component";
+import {
+  GroupMembersManagementDialogComponent
+} from "../dialogs/group-members-management-dialog/group-members-management-dialog.component";
 
 @Component({
   selector: 'app-support-groups-management',
@@ -130,6 +133,13 @@ export class SupportGroupsManagementComponent implements AfterViewInit
 
     editGroupDataDialog.afterClosed().subscribe(result => {
       if(result) this.loadGroups();
+    });
+  }
+
+  openDialogToManagementGroupMembers(groupId: string): void
+  {
+    const managementMembersDialog = this.dialog.open(GroupMembersManagementDialogComponent, {
+      data: groupId
     });
   }
 }

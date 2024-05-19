@@ -1,10 +1,10 @@
 package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,8 +12,8 @@ import java.util.UUID;
 @Setter
 @Builder
 @Component
-public class UserId
+public class MembersToModifyDTO
 {
-    @NotNull
-    private UUID userId;
+    private List<GroupMemberDetailsDTO> addedUsers = new ArrayList<>();
+    private List<GroupMemberDetailsDTO> otherUsers = new ArrayList<>();
 }

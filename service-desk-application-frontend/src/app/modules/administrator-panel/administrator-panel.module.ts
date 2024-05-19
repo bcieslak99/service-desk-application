@@ -21,6 +21,7 @@ import { SupportGroupsManagementComponent } from './components/support-groups-ma
 import { NewGroupDialogComponent } from './components/dialogs/new-group-dialog/new-group-dialog.component';
 import {MatSelectModule} from "@angular/material/select";
 import { EditGroupDataDialogComponent } from './components/dialogs/edit-group-data-dialog/edit-group-data-dialog.component';
+import { GroupMembersManagementDialogComponent } from './components/dialogs/group-members-management-dialog/group-members-management-dialog.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { EditGroupDataDialogComponent } from './components/dialogs/edit-group-da
     SupportGroupsManagementComponent,
     NewGroupDialogComponent,
     EditGroupDataDialogComponent,
+    GroupMembersManagementDialogComponent,
   ],
   imports: [
     CommonModule,

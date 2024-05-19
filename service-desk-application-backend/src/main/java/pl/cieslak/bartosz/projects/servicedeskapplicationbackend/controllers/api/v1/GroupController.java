@@ -7,7 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupDetailsDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.UserId;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.UserId;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.NewGroupDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
@@ -92,8 +92,8 @@ public class GroupController
 
     @DeleteMapping("/member/remove/{id}")
     @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
-    public ResponseEntity<ResponseMessage> removeMemberToGroup(@PathVariable("id") UUID groupId,
-                                                               @Valid @RequestBody UserId memberId, BindingResult errors)
+    public ResponseEntity<ResponseMessage> removeMemberFromGroup(@PathVariable("id") UUID groupId,
+                                                                 @Valid @RequestBody UserId memberId, BindingResult errors)
     {
         if(groupId == null || errors.hasErrors())
             return ResponseEntity.badRequest().body(new ResponseMessage("Błąd! Podano nie prawidłowe dane!", ResponseCode.ERROR));
@@ -106,6 +106,13 @@ public class GroupController
     public ResponseEntity<?> getMembersOfGroup(@PathVariable("id") UUID groupId)
     {
         return this.GROUP_SERVICE.getGroupMembers(groupId);
+    }
+
+    @GetMapping("/members/management/{id}")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<?> getMembersToModify(@PathVariable("id") UUID groupId)
+    {
+        return this.GROUP_SERVICE.getMembersToModify(groupId);
     }
 
     @PatchMapping("/manager/set/{id}")

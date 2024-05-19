@@ -53,7 +53,7 @@
                   <mat-icon>description</mat-icon>
                   <span>Modyfikacja danych</span>
                 </button>
-                <button mat-menu-item>
+                <button mat-menu-item (click)="openDialogToManagementGroupMembers(row.groupId)">
                   <mat-icon>group</mat-icon>
                   <span>Zarządzanie członkami</span>
                 </button>
