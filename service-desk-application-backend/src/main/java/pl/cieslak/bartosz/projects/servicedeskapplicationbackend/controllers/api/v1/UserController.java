@@ -30,6 +30,13 @@ public class UserController
         return ResponseEntity.ok(this.USER_SERVICE.getAllUsers());
     }
 
+    @GetMapping("/list/active")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<List<UserDetailsDTO>> getActiveUsers()
+    {
+        return ResponseEntity.ok(this.USER_SERVICE.getActiveUsers());
+    }
+
     @GetMapping("/details/{id}")
     @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
     public ResponseEntity<?> getUserDetails(@PathVariable("id") UUID userId)

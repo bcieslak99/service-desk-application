@@ -57,7 +57,7 @@
                   <mat-icon>group</mat-icon>
                   <span>Zarządzanie członkami</span>
                 </button>
-                <button mat-menu-item>
+                <button mat-menu-item (click)="openDialogToSetManager(row.groupId)">
                   <mat-icon>assignment_ind</mat-icon>
                   <span>Ustal kierownika grupy</span>
                 </button>

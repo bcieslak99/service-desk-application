@@ -45,6 +45,7 @@ public class UserService
         if(user == null) return null;
 
         return UserContactDTO.builder()
+                .userId(user.getId())
                 .name(user.getName())
                 .surname(user.getSurname())
                 .mail(user.getMail())
@@ -69,6 +70,19 @@ public class UserService
     public List<UserDetailsDTO> getAllUsers()
     {
         List<User> usersInDatabase = this.USER_REPOSITORY.getAllUsers();
+        List<UserDetailsDTO> users = new ArrayList<>();
+
+        for(User user : usersInDatabase)
+            users.add(prepareUserDetails(user));
+
+        users = users.stream().filter(Objects::nonNull).collect(Collectors.toList());
+
+        return users;
+    }
+
+    public List<UserDetailsDTO> getActiveUsers()
+    {
+        List<User> usersInDatabase = this.USER_REPOSITORY.getActiveUsers();
         List<UserDetailsDTO> users = new ArrayList<>();
 
         for(User user : usersInDatabase)

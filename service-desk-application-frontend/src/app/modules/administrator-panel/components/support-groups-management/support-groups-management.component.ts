@@ -14,6 +14,7 @@ import {EditGroupDataDialogComponent} from "../dialogs/edit-group-data-dialog/ed
 import {
   GroupMembersManagementDialogComponent
 } from "../dialogs/group-members-management-dialog/group-members-management-dialog.component";
+import {GroupManagerDialogComponent} from "../dialogs/group-manager-dialog/group-manager-dialog.component";
 
 @Component({
   selector: 'app-support-groups-management',
@@ -141,5 +142,12 @@ export class SupportGroupsManagementComponent implements AfterViewInit
     const managementMembersDialog = this.dialog.open(GroupMembersManagementDialogComponent, {
       data: groupId
     });
+  }
+
+  openDialogToSetManager(groupId: string)
+  {
+    const managerDialog = this.dialog.open(GroupManagerDialogComponent, {
+      data: groupId
+    })
   }
 }

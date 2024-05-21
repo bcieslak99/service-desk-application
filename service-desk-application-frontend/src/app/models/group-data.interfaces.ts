@@ -10,6 +10,7 @@ export interface GroupData
 
 export interface ManagerData
 {
+  userId: string,
   name: string,
   surname: string,
   mail: string,

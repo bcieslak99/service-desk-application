@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserContactDTO
 {
+    private UUID userId;
+
     @NotNull
     private String name;
 

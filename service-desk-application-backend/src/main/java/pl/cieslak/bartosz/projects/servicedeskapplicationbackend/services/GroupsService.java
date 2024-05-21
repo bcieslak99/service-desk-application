@@ -450,7 +450,7 @@ public class GroupsService
     private List<GroupMemberDetailsDTO> getUsersToAdd(UUID groupId)
     {
         List<User> usersInGroup = this.GROUP_REPOSITORY.getMembersFromGroup(groupId);
-        List<User> allUsers = this.USER_REPOSITORY.getAllUsers();
+        List<User> allUsers = this.USER_REPOSITORY.getActiveUsers();
 
         allUsers = allUsers.stream().filter(user -> user.isActive() && usersInGroup
                 .stream().noneMatch(element -> element.getId().equals(user.getId()))).collect(Collectors.toList());
