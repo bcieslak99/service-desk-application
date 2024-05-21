@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable, NgZone} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
 
 @Injectable({
@@ -8,13 +8,15 @@ export class GlobalSpinnerService
 {
   isLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  showSpinner(): void
-  {
-    this.isLoading.next(true);
+  showSpinner(): void {
+    setTimeout(() => {
+      this.isLoading.next(true);
+    });
   }
 
-  hideSpinner(): void
-  {
-    this.isLoading.next(false);
+  hideSpinner(): void {
+    setTimeout(() => {
+      this.isLoading.next(false);
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component} from '@angular/core';
 import {GlobalSpinnerService} from "../../services/global-spinner.service";
 import {BehaviorSubject} from "rxjs";
 
@@ -7,9 +7,20 @@ import {BehaviorSubject} from "rxjs";
   templateUrl: './global-spinner.component.html',
   styleUrls: ['./global-spinner.component.css']
 })
-export class GlobalSpinnerComponent
+export class GlobalSpinnerComponent implements AfterViewInit
 {
-  isLoading: BehaviorSubject<boolean> = this.spinnerService.isLoading;
+  isLoading: BehaviorSubject<boolean>;
 
-  constructor(private spinnerService: GlobalSpinnerService) {}
+  constructor(
+    private spinnerService: GlobalSpinnerService,
+    private cdRef: ChangeDetectorRef
+  ) {
+    this.isLoading = this.spinnerService.isLoading;
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.cdRef.detectChanges();
+    }, 0);
+  }
 }
