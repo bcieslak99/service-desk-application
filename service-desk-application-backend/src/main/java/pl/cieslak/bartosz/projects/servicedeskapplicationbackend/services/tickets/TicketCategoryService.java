@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.CategoryDetailsDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.NewTicketCategoryDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupDetailsDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TicketCategoryService
 {
+    private static final String CATEGORY_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanej kategorii";
     private final TicketCategoriesRepository TICKET_CATEGORY_REPOSITORY;
     private final GroupsService GROUP_SERVICE;
 
@@ -37,7 +39,7 @@ public class TicketCategoryService
                 .description(category.getDescription())
                 .categoryActive(category.isCategoryIsActive())
                 .ticketType(category.getTicketType())
-                .defaultGroup(category.getDefaultGroup().getId())
+                .defaultGroup(this.GROUP_SERVICE.prepareGroupDetails(category.getDefaultGroup()))
                 .build();
     }
 
@@ -106,7 +108,7 @@ public class TicketCategoryService
 
             this.TICKET_CATEGORY_REPOSITORY.saveAndFlush(category);
 
-            return ResponseEntity.ok(new ResponseMessage("Grupa została utworzona.", ResponseCode.SUCCESS));
+            return ResponseEntity.ok(new ResponseMessage("Kategoria została utworzona.", ResponseCode.SUCCESS));
         }
         catch(CategoryDataEmptyException | CategoryExistsException | GroupNotFoundException exception)
         {
@@ -154,6 +156,64 @@ public class TicketCategoryService
             return ResponseEntity.internalServerError()
                     .body(new ResponseMessage("Napotkano na nieoczekiwany błąd podczas edycji danych kategorii.",
                             ResponseCode.ERROR));
+        }
+    }
+
+    public ResponseEntity<ResponseMessage> activateCategory(UUID categoryId)
+    {
+        try
+        {
+            if(categoryId == null)
+                throw new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE);
+
+            Optional<TicketCategory> categoryInDatabase = this.TICKET_CATEGORY_REPOSITORY.findById(categoryId);
+
+            if(categoryInDatabase.isEmpty())
+                throw new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE);
+
+            TicketCategory category = categoryInDatabase.get();
+
+            category.setCategoryIsActive(true);
+            this.TICKET_CATEGORY_REPOSITORY.saveAndFlush(category);
+
+            return ResponseEntity.ok(new ResponseMessage("Kategoria została aktywowana", ResponseCode.SUCCESS));
+        }
+        catch(CategoryNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
+        }
+    }
+
+    public ResponseEntity<ResponseMessage> deactivateCategory(UUID categoryId)
+    {
+        try
+        {
+            if(categoryId == null)
+                throw new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE);
+
+            Optional<TicketCategory> categoryInDatabase = this.TICKET_CATEGORY_REPOSITORY.findById(categoryId);
+
+            if(categoryInDatabase.isEmpty())
+                throw new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE);
+
+            TicketCategory category = categoryInDatabase.get();
+
+            category.setCategoryIsActive(false);
+            this.TICKET_CATEGORY_REPOSITORY.saveAndFlush(category);
+
+            return ResponseEntity.ok(new ResponseMessage("Kategoria została dezaktywowana", ResponseCode.SUCCESS));
+        }
+        catch(CategoryNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
         }
     }
 }

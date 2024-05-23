@@ -14,7 +14,7 @@ import java.util.UUID;
 @Repository
 interface TicketCategoriesSQLRepository extends JpaRepository<TicketCategory, UUID>, TicketCategoriesRepository
 {
-    @Query("select c from TicketCategory as c left join fetch c.defaultGroup as dg order by c.ticketType, c.name")
+    @Query("select c from TicketCategory as c left join fetch c.defaultGroup as dg left join fetch dg.groupManager order by c.categoryIsActive desc, c.ticketType, c.name")
     List<TicketCategory> gettAllCategories();
 
     @Query("select c from TicketCategory as c left join fetch c.defaultGroup as dg where c.ticketType = :ticketType order by c.name")

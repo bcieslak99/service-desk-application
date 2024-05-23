@@ -28,7 +28,7 @@ public class GroupsService
     private final UserService USER_SERVICE;
     private final UserRepository USER_REPOSITORY;
 
-    public GroupDetailsDTO prepareGroupAsListElement(SupportGroup group)
+    public GroupDetailsDTO prepareGroupDetails(SupportGroup group)
     {
         if(group == null) return null;
 
@@ -70,7 +70,7 @@ public class GroupsService
         List<GroupDetailsDTO> groupsToShow = new ArrayList<>();
 
         for(SupportGroup element : groups)
-            groupsToShow.add(prepareGroupAsListElement(element));
+            groupsToShow.add(prepareGroupDetails(element));
 
         groupsToShow = groupsToShow.stream().filter(Objects::nonNull).collect(Collectors.toList());
 
@@ -90,7 +90,7 @@ public class GroupsService
             if(groupInDatabase.isEmpty())
                 throw new GroupNotFoundException(ERROR_MESSAGE);
 
-            return ResponseEntity.ok(prepareGroupAsListElement(groupInDatabase.get()));
+            return ResponseEntity.ok(prepareGroupDetails(groupInDatabase.get()));
         }
         catch (GroupNotFoundException exception)
         {

@@ -57,7 +57,7 @@ export class UsersManagementComponent implements AfterViewInit
     }
   }
 
-  private loadUsers(): void
+  loadUsers(): void
   {
     this.getUsersList().subscribe({
       next: value =>  {

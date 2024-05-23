@@ -2,6 +2,7 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto
 
 import lombok.*;
 import org.springframework.stereotype.Component;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupDetailsDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketType;
 
 import java.util.UUID;
@@ -19,5 +20,5 @@ public class CategoryDetailsDTO
     private String description;
     private boolean categoryActive;
     private TicketType ticketType;
-    private UUID defaultGroup;
+    private GroupDetailsDTO defaultGroup;
 }

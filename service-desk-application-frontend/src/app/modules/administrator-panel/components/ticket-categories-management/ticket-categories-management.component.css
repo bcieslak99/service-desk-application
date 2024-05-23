@@ -1,0 +1,19 @@
+.filter-input
+{
+  width: 100%;
+}
+
+.status
+{
+  font-weight: 600;
+}
+
+.active-category
+{
+  color: limegreen;
+}
+
+.no-active-category
+{
+  color: orangered;
+}

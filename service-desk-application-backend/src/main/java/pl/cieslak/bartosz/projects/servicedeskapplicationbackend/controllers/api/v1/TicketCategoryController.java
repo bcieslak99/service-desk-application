@@ -95,4 +95,18 @@ public class TicketCategoryController
 
         return this.TICKET_CATEGORY_SERVICE.editCategoryData(categoryId, categoryData);
     }
+
+    @PatchMapping("/activate/{id}")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<ResponseMessage> activateCategory(@PathVariable("id") UUID categoryId)
+    {
+        return this.TICKET_CATEGORY_SERVICE.activateCategory(categoryId);
+    }
+
+    @PatchMapping("/deactivate/{id}")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<ResponseMessage> deactivateCategory(@PathVariable("id") UUID categoryId)
+    {
+        return this.TICKET_CATEGORY_SERVICE.deactivateCategory(categoryId);
+    }
 }
