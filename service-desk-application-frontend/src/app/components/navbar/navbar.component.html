@@ -1,5 +1,16 @@
 <mat-toolbar color="primary">
   <span>Service Desk</span>
   <span class="spacer"></span>
-  <button *ngIf="userIsLogged() | async" mat-flat-button color="primary" type="button" class="text-end" (click)="logout()">Wyloguj</button>
+  <button *ngIf="(userIsLogged() | async) && getNumberOfRoles() <= 1; else moreRoles" mat-flat-button color="primary" type="button" class="text-end" (click)="logout()"><mat-icon>logout</mat-icon> Wyloguj</button>
+  <ng-template #moreRoles>
+    <button mat-icon-button [matMenuTriggerFor]="menu" class="text-end" *ngIf="(userIsLogged() | async)">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="redirectToAdministratorPanel()"><mat-icon class="material-symbols-outlined">admin_panel_settings</mat-icon> Panel administratora</button>
+      <button mat-menu-item (click)="redirectToAnalystPanel()"><mat-icon>analytics</mat-icon> Panel analityka</button>
+      <button mat-menu-item (click)="redirectToEmployeePanel()"><mat-icon>badge</mat-icon> Panel pracownika</button>
+      <button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Wyloguj</button>
+    </mat-menu>
+  </ng-template>
 </mat-toolbar>

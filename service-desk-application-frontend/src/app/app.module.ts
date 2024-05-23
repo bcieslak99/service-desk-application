@@ -16,6 +16,7 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {GlobalSpinnerInterceptor} from "./guards_and_interceptors/global-spinner.interceptor";
 import {AuthorizationInterceptor} from "./guards_and_interceptors/authorization.interceptor";
 import { AccessDeniedViewComponent } from './components/access-denied-view/access-denied-view.component';
+import {MatMenuModule} from "@angular/material/menu";
 
 const notifierConfig: NotifierOptions = {
   theme: "material"
@@ -28,18 +29,19 @@ const notifierConfig: NotifierOptions = {
     GlobalSpinnerComponent,
     AccessDeniedViewComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    RouterOutlet,
-    MatToolbarModule,
-    MatIconModule,
-    HttpClientModule,
-    NotifierModule.withConfig(notifierConfig),
-    MatButtonModule,
-    MatProgressSpinnerModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        RouterOutlet,
+        MatToolbarModule,
+        MatIconModule,
+        HttpClientModule,
+        NotifierModule.withConfig(notifierConfig),
+        MatButtonModule,
+        MatProgressSpinnerModule,
+        MatMenuModule
+    ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: GlobalSpinnerInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: AuthorizationInterceptor, multi: true}

@@ -96,9 +96,9 @@ export class AuthService
     }
   }
 
-  userIsAdministrator(): boolean
+  getUserRoles(): string[]
   {
-    if(this.userLogged === null) return false;
-    return this.userLogged.roles.filter(element=> element === "SYSTEM_ADMINISTRATOR").length > 0;
+    if(this.userLogged === null) return []
+    else return this.userLogged.roles;
   }
 }
