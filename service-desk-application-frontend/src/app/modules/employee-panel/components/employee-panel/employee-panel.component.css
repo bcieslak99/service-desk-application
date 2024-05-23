@@ -1,0 +1,16 @@
+.ticket-type
+{
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.panel-min-height
+{
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-content
+{
+  flex: 1;
+}

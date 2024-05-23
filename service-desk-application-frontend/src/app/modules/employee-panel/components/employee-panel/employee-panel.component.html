@@ -1,1 +1,96 @@
-<p>employee-panel works!</p>
+<div class="container-fluid mt-5">
+  <div class="row justify-content-around d-flex align-items-stretch">
+
+    <div class="col-12 col-md-10 col-lg-6 d-flex">
+      <mat-card class="panel-min-height flex-fill">
+        <mat-card-header>
+          <mat-card-title>Service Desk</mat-card-title>
+          <mat-card-subtitle>Informacje ogólne</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="panel-content">
+          <div class="mt-3">
+            <p>Witaj w systemie Service Desk naszej organizacji!</p>
+            <p>
+              Jeżeli potrzebujesz naszej pomocy możesz zarejestrować zgłoszenie. Zgłoszenie zostanie przydzielone do
+              odpowiedniego zespołu, który zajmie się realizacją. Service Desk obsługuje zgłoszenia dotyczące usterek,
+              ale również możesz złożyć wniosek o usługę jeżeli potrzebujesz pomocy.
+            </p>
+            <p>
+              Przed rejestracją zgłoszenia prosimy o zapoznanie się z zaleceniami jak należy rejestrować zgłoszenia.
+              Czas realizacji jest bardzo mocno uzależniony od prawidłowej rejestracji!
+            </p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="col-12 col-md-10 col-lg-6 d-flex mt-3 mt-lg-0">
+      <mat-card class="panel-min-height flex-fill">
+        <mat-card-header>
+          <mat-card-title>Moje zgłoszenia</mat-card-title>
+          <mat-card-subtitle>Informacje na temat realizacji moich zgłoszeń</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="panel-content">
+          <div class="mt-3">
+            <p>Aby sprawdzić stan swoich zgłoszeń kliknij w odpowiedni odnośnik:</p>
+            <div>
+              <div class="ticket-type">Incydenty:</div>
+              <div class="mt-1">
+                <button class="mx-2 mt-3 mt-lg-2" mat-raised-button>W trakcie realizacji: 0</button>
+                <button class="mx-2 mt-3 mt-lg-2" mat-raised-button>Wstrzymane: 0</button>
+                <button class="mx-2 mt-3 mt-lg-2" mat-raised-button>Rozwiązane: 0</button>
+              </div>
+            </div>
+            <div class="mt-3">
+              <div class="ticket-type">Wnioski o usługę:</div>
+              <div class="mt-1">
+                <button class="mx-2 mt-3 mt-lg-2" mat-raised-button>W trakcie realizacji: 0</button>
+                <button class="mx-2 mt-3 mt-lg-2" mat-raised-button>Wstrzymane: 0</button>
+                <button class="mx-2 mt-3 mt-lg-2" mat-raised-button>Rozwiązane: 0</button>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-12 mt-3">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Jak rejestrować zgłoszenia</mat-card-title>
+          <mat-card-subtitle>Zalecenia jak rejestrować zgłoszenia.</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="mt-3">
+            <p>Rodzaje zgłoszeń jakie możesz zarejestrować:</p>
+            <ul>
+              <li><b>Incydent</b> - zgłoszenie dotyczące usterek lub wymiany</li>
+              <li><b>Wniosek o usługę</b> - zgłoszenie dotyczące wykonania usługi przez Service Desk</li>
+            </ul>
+          </div>
+          <div class="mt-3">
+            <p>
+              Jeżeli chcesz zgłosić jakiś problem z niedziałającym urządzeniem, funkcjonalnością itp. należy zarejestrować
+              incydent.
+              W przypadku wykonania usługi, np. podłączenia urządzenia wielofunkcyjnego, zaopatrzenie w nowy komputer itp.
+              należy zarejestrować wniosek o usługę.
+            </p>
+            <p>
+              Gdy wybierzesz typ zgłoszenia należy jeszcze dobrać kategorię odpowiadającą zadaniu, które chce zgłosić.
+              Może pojawić się sytuacja kiedy nie będzie odpowiedniej kategorii do wyboru. W takiej sytuacji należy wybrać
+              jak najbardziej zbliżoną. Przykładowo chcesz zgłosić, że w systemie kadrowym nie możesz wyświetlić pasków
+              płacowych. Gdy chcesz to zgłosić nie jesteś w stanie znaleźć kategorii odpowiadającą za tą zakładkę. Jednak
+              jest kategoria odpowiadająca za problem z wyświetleniem strony startowej. Nie dotyczy zakładki z paskami płacowymi,
+              ale jest w nazwie "wyświetlenie strony". W takiej sytuacji wybieramy tą kategorię.
+            </p>
+            <p>
+              Od prawidłowej rejestracji zgłoszeń jest bardzo mocno uzależniony czas realizacji! Pamiętaj o tym!
+            </p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
