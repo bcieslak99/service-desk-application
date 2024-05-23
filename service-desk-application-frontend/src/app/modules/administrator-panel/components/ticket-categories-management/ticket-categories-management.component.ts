@@ -8,6 +8,7 @@ import {MatSort} from "@angular/material/sort";
 import {TicketCategory} from "../../../../models/ticket.interfaces";
 import {MatTableDataSource} from "@angular/material/table";
 import {ServerResponsesMessage} from "../../../../models/server-responses.interfaces";
+import {NewCategoryDialogComponent} from "../dialogs/new-category-dialog/new-category-dialog.component";
 
 @Component({
   selector: 'app-ticket-categories-management',
@@ -120,6 +121,10 @@ export class TicketCategoriesManagementComponent implements AfterViewInit
 
   openDialogToCreateNewTicketCategory(): void
   {
+    const dialogToCreateCategory = this.dialog.open(NewCategoryDialogComponent);
 
+    dialogToCreateCategory.afterClosed().subscribe(result => {
+      if(result) this.loadCategories();
+    })
   }
 }

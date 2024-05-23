@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>Dodawanie nowej kategorii</h2>
+<mat-dialog-content class="mat-typography">
+  <form [formGroup]="categoryForm" (ngSubmit)="createCategory()">
+    <div class="container-fluid">
+
+      <hr>
+
+      <div class="row justify-content-center">
+        <mat-form-field>
+          <mat-label>Nazwa kategorii</mat-label>
+          <input matInput formControlName="name">
+        </mat-form-field>
+      </div>
+
+      <div class="row justify-content-center">
+        <mat-form-field>
+          <mat-label>Opis</mat-label>
+          <textarea matInput formControlName="description"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="row justify-content-center">
+        <mat-form-field>
+          <mat-label>Typ zgłoszenia</mat-label>
+          <mat-select formControlName="ticketType">
+            <mat-option value="INCIDENT">Incydent</mat-option>
+            <mat-option value="SERVICE_REQUEST">Wniosek o usługę</mat-option>
+            <mat-option value="PROBLEM">Problem</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="row justify-content-center">
+        <mat-form-field>
+          <mat-label>Domyślna grupa</mat-label>
+          <mat-select formControlName="defaultGroup">
+            <mat-option *ngFor="let group of activeGroups" [value]="group.groupId">{{group.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <hr>
+
+      <div class="my-3 text-center">
+        <button mat-raised-button color="warn" type="button" (click)="closeDialog()"><mat-icon>block</mat-icon> Anuluj dodawanie</button>
+        <button mat-raised-button color="primary" type="submit" class="ms-3" [disabled]="!dataIsCorrect()"><mat-icon>add</mat-icon> Dodaj kategorię</button>
+      </div>
+
+    </div>
+  </form>
+</mat-dialog-content>

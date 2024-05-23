@@ -24,6 +24,7 @@ import { EditGroupDataDialogComponent } from './components/dialogs/edit-group-da
 import { GroupMembersManagementDialogComponent } from './components/dialogs/group-members-management-dialog/group-members-management-dialog.component';
 import { GroupManagerDialogComponent } from './components/dialogs/group-manager-dialog/group-manager-dialog.component';
 import { TicketCategoriesManagementComponent } from './components/ticket-categories-management/ticket-categories-management.component';
+import { NewCategoryDialogComponent } from './components/dialogs/new-category-dialog/new-category-dialog.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { TicketCategoriesManagementComponent } from './components/ticket-categor
     GroupMembersManagementDialogComponent,
     GroupManagerDialogComponent,
     TicketCategoriesManagementComponent,
+    NewCategoryDialogComponent,
   ],
   imports: [
     CommonModule,
