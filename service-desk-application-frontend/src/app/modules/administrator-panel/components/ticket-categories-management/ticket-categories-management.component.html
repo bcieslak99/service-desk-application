@@ -52,13 +52,9 @@
                 <mat-icon>menu</mat-icon>
               </button>
               <mat-menu #menu="matMenu">
-                <button mat-menu-item>
+                <button mat-menu-item (click)="openDialogToModifyTicketCategoryData(row.categoryId)">
                   <mat-icon>description</mat-icon>
                   <span>Modyfikuj kategorię</span>
-                </button>
-                <button mat-menu-item>
-                  <mat-icon>group</mat-icon>
-                  <span>Zmień grupę domyślną</span>
                 </button>
                 <button mat-menu-item *ngIf="row.categoryActive === false; else deactivateCategoryButton" (click)="activateCategory(row.categoryId)">
                   <mat-icon>toggle_on</mat-icon>

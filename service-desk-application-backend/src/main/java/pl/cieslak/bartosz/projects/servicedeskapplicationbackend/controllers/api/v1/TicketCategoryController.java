@@ -73,6 +73,14 @@ public class TicketCategoryController
         return ResponseEntity.ok(this.TICKET_CATEGORY_SERVICE.getActiveCategoriesByTicketType(TicketType.PROBLEM));
     }
 
+    @GetMapping("/details/{id}")
+    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    public ResponseEntity<?> getCategoryDetails(@PathVariable("id") UUID categoryId)
+    {
+        return this.TICKET_CATEGORY_SERVICE.getCategoryDetails(categoryId);
+    }
+
+
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
     public ResponseEntity<ResponseMessage> createNewCategory(@Valid @RequestBody NewTicketCategoryDTO categoryData, BindingResult errors)

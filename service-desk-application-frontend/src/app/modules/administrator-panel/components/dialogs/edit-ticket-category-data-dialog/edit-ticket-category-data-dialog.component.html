@@ -1,6 +1,6 @@
-<h2 mat-dialog-title>Dodawanie nowej kategorii</h2>
+<h2 mat-dialog-title>Edytuj dane kategorii</h2>
 <mat-dialog-content class="mat-typography">
-  <form [formGroup]="categoryForm" (ngSubmit)="createCategory()">
+  <form [formGroup]="categoryForm" (ngSubmit)="editCategory()">
     <div class="container-fluid">
 
       <hr>
@@ -46,7 +46,7 @@
         <mat-form-field>
           <mat-label>Domyślna grupa</mat-label>
           <mat-select formControlName="defaultGroup">
-            <mat-option *ngFor="let group of activeGroups" [value]="group.groupId">{{group.name}}</mat-option>
+            <mat-option *ngFor="let group of groups" [value]="group.groupId">{{group.name}}</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
@@ -54,8 +54,8 @@
       <hr>
 
       <div class="my-3 text-center">
-        <button mat-raised-button color="warn" type="button" (click)="closeDialog()"><mat-icon>block</mat-icon> Anuluj dodawanie</button>
-        <button mat-raised-button color="primary" type="submit" class="ms-3" [disabled]="!dataIsCorrect()"><mat-icon>add</mat-icon> Dodaj kategorię</button>
+        <button mat-raised-button color="warn" type="button" (click)="closeDialog(false)"><mat-icon>block</mat-icon> Anuluj edycję</button>
+        <button mat-raised-button color="primary" type="submit" class="ms-3" [disabled]="!dataIsCorrect()" (click)="editCategory()"><mat-icon>edit</mat-icon> Edyctuj kategorię</button>
       </div>
 
     </div>

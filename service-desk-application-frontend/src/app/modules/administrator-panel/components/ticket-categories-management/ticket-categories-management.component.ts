@@ -9,6 +9,9 @@ import {TicketCategory} from "../../../../models/ticket.interfaces";
 import {MatTableDataSource} from "@angular/material/table";
 import {ServerResponsesMessage} from "../../../../models/server-responses.interfaces";
 import {NewCategoryDialogComponent} from "../dialogs/new-category-dialog/new-category-dialog.component";
+import {
+  EditTicketCategoryDataDialogComponent
+} from "../dialogs/edit-ticket-category-data-dialog/edit-ticket-category-data-dialog.component";
 
 @Component({
   selector: 'app-ticket-categories-management',
@@ -126,5 +129,16 @@ export class TicketCategoriesManagementComponent implements AfterViewInit
     dialogToCreateCategory.afterClosed().subscribe(result => {
       if(result) this.loadCategories();
     })
+  }
+
+  openDialogToModifyTicketCategoryData(categoryId: string): void
+  {
+    const dialogToModifyTicketCategoryData = this.dialog.open(EditTicketCategoryDataDialogComponent, {
+      data: categoryId
+    })
+
+    dialogToModifyTicketCategoryData.afterClosed().subscribe(result => {
+      if(result) this.loadCategories();
+    });
   }
 }

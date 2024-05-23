@@ -26,7 +26,7 @@ public class GroupController
 
     @GetMapping("/list")
     @PreAuthorize("hasAnyAuthority('SYSTEM_ADMINISTRATOR')")
-    public ResponseEntity<List<GroupDetailsDTO>> showActiveGroups()
+    public ResponseEntity<List<GroupDetailsDTO>> showGroups()
     {
         return this.GROUP_SERVICE.getAllGroups();
     }

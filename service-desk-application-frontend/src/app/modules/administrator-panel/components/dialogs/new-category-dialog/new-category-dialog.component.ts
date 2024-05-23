@@ -38,6 +38,40 @@ export class NewCategoryDialogComponent implements OnInit
     });
   }
 
+  getErrorNameMessage(): string | null
+  {
+    const nameControl = this.categoryForm.controls["name"];
+
+    if(nameControl.invalid)
+    {
+      if(nameControl.hasError("required"))
+        return "To pole jest wymagane!";
+      else if(nameControl.hasError("minlength"))
+        return "Nazwa kategorii musi się składać z minimum 3 znkaów!";
+      else if(nameControl.hasError("maxlength"))
+        return "Nazwa kategorii może się składać maksymalnie z 300 znaków!";
+      else return "Nieznany błąd."
+    }
+    else return null;
+  }
+
+  getErrorDescriptionMessage(): string | null
+  {
+    const descriptionControl = this.categoryForm.controls["description"];
+
+    if(descriptionControl.invalid)
+    {
+      if(descriptionControl.hasError("required"))
+        return "To pole jest wymagane!";
+      else if(descriptionControl.hasError("minlength"))
+        return "Opis kategorii musi się składać z minimum 5 znkaów!";
+      else if(descriptionControl.hasError("maxlength"))
+        return "Opis kategorii może się składać maksymalnie z 1000 znaków!";
+      else return "Nieznany błąd."
+    }
+    else return null;
+  }
+
   dataIsCorrect(): boolean
   {
     return !this.categoryForm.invalid;

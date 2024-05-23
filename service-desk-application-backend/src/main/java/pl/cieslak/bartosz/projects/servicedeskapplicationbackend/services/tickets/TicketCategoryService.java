@@ -216,4 +216,28 @@ public class TicketCategoryService
             return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
         }
     }
+
+    public ResponseEntity<?> getCategoryDetails(UUID categoryId)
+    {
+        try
+        {
+            if(categoryId == null)
+                throw new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE);
+
+            Optional<TicketCategory> categoryInDatabase = this.TICKET_CATEGORY_REPOSITORY.findById(categoryId);
+
+            if(categoryInDatabase.isEmpty())
+                throw new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE);
+
+            return ResponseEntity.ok(prepareCategoryDetails(categoryInDatabase.get()));
+        }
+        catch(CategoryNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
+        }
+    }
 }
