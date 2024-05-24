@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.CategoryDetailsDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.NewTicketCategoryDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupDetailsDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
@@ -239,5 +238,17 @@ public class TicketCategoryService
         {
             return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
         }
+    }
+
+    public Optional<TicketCategory> getCategoryAndGroupById(UUID categoryId)
+    {
+        if(categoryId == null) return Optional.empty();
+        return this.TICKET_CATEGORY_REPOSITORY.getCategoryAndGroupById(categoryId);
+    }
+
+    public Optional<TicketCategory> getCategoryById(UUID categoryId)
+    {
+        if(categoryId == null) return Optional.empty();
+        return this.TICKET_CATEGORY_REPOSITORY.findById(categoryId);
     }
 }

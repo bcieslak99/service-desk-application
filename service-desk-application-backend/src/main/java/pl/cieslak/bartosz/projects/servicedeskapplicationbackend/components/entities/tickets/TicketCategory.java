@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.CategoryDetailsForEmployeeDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
 
 import java.util.ArrayList;
@@ -53,4 +54,13 @@ public class TicketCategory
     @ManyToOne
     @JoinColumn(name = "default_group", nullable = false)
     private SupportGroup defaultGroup;
+
+    public CategoryDetailsForEmployeeDTO prepareCategoryDetailsForEmployee()
+    {
+        return CategoryDetailsForEmployeeDTO.builder()
+                .id(this.id)
+                .name(this.name)
+                .description(this.description)
+                .build();
+    }
 }

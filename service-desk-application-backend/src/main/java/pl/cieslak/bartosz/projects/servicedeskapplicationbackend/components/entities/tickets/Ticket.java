@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketDetailsForEmployeeDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 
@@ -76,4 +77,36 @@ public class Ticket
     @ManyToOne
     @JoinColumn(name = "CATEGORY", nullable = false)
     private TicketCategory category;
+
+    public TicketDetailsForEmployeeDTO prepareDetailsForEmployee()
+    {
+        return TicketDetailsForEmployeeDTO.builder()
+                .id(this.id)
+                .ticketType(this.ticketType)
+                .description(this.description)
+                .customer(this.customer.prepareUserDetails())
+                .reporter(this.reporter.prepareUserDetails())
+                .status(this.status)
+                .openDate(this.openDate)
+                .resolveDate(this.resolveDate)
+                .closeDate(this.closeDate)
+                .category(this.category.prepareCategoryDetailsForEmployee())
+                .build();
+    }
+
+    public TicketDetailsForEmployeeDTO prepareDetailsForAnalyst()
+    {
+        return TicketDetailsForEmployeeDTO.builder()
+                .id(this.id)
+                .ticketType(this.ticketType)
+                .description(this.description)
+                .customer(this.customer.prepareUserDetails())
+                .reporter(this.reporter.prepareUserDetails())
+                .status(this.status)
+                .openDate(this.openDate)
+                .resolveDate(this.resolveDate)
+                .closeDate(this.closeDate)
+                .category(this.category.prepareCategoryDetailsForEmployee())
+                .build();
+    }
 }

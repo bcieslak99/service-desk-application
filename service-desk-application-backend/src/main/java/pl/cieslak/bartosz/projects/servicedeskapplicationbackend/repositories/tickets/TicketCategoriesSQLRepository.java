@@ -24,4 +24,7 @@ interface TicketCategoriesSQLRepository extends JpaRepository<TicketCategory, UU
     List<TicketCategory> getActiveCategoriesByTicketType(@Param("ticketType") TicketType ticketType);
 
     Optional<TicketCategory> getTicketCategoryByName(String name);
+
+    @Query("select c from TicketCategory as c left join fetch c.defaultGroup as dg where c.id = :id")
+    Optional<TicketCategory> getCategoryAndGroupById(@Param("id") UUID categoryId);
 }

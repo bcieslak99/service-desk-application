@@ -16,4 +16,5 @@ public interface TicketCategoriesRepository
     List<TicketCategory> getActiveCategoriesByTicketType(TicketType ticketType);
     Optional<TicketCategory> getTicketCategoryByName(String name);
     Optional<TicketCategory> findById(UUID categoryId);
+    Optional<TicketCategory> getCategoryAndGroupById(UUID categoryId);
 }
