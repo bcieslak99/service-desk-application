@@ -4,8 +4,7 @@ import { EmployeePanelComponent } from './components/employee-panel/employee-pan
 import {EmployeePanelRoutingModule} from "./employee-panel-routing.module";
 import {MatCardModule} from "@angular/material/card";
 import {MatButtonModule} from "@angular/material/button";
-
-
+import {MatIconModule} from "@angular/material/icon";
 
 @NgModule({
   declarations: [
@@ -15,7 +14,8 @@ import {MatButtonModule} from "@angular/material/button";
     CommonModule,
     EmployeePanelRoutingModule,
     MatCardModule,
-    MatButtonModule
+    MatButtonModule,
+    MatIconModule
   ]
 })
 export class EmployeePanelModule { }
