@@ -15,6 +15,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exce
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.configuration.starters.FirstAdministratorAccount;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.user.UserRepository;
 
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,19 @@ import java.util.stream.Collectors;
 public class UserService
 {
     private final UserRepository USER_REPOSITORY;
+
+    public UUID extractUserId(Principal principal)
+    {
+        try
+        {
+            if(principal == null || principal.getName() == null) return null;
+            return UUID.fromString(principal.getName());
+        }
+        catch (Exception exception)
+        {
+            return null;
+        }
+    }
 
     public Optional<User> getUserByMail(String mail)
     {

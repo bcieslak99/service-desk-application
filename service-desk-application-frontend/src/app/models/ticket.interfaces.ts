@@ -9,3 +9,17 @@ export interface TicketCategory
   ticketType: string,
   defaultGroup: GroupData
 }
+
+export interface EmployeeTicketStatusStatistics
+{
+  pending: number,
+  inProgress: number,
+  onHold: number,
+  resolved: number,
+}
+
+export interface EmployeeTicketTypeStatistics
+{
+  incidents: EmployeeTicketStatusStatistics,
+  serviceRequests: EmployeeTicketStatusStatistics
+}

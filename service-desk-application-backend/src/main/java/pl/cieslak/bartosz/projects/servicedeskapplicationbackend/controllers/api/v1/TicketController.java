@@ -15,6 +15,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exce
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketActivityService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketCategoryService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketService;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
 import java.security.Principal;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class TicketController
     private final TicketService TICKET_SERVICE;
     private final TicketCategoryService TICKET_CATEGORY_SERVICE;
     private final TicketActivityService TICKET_ACTIVITY_SERVICE;
+    private final UserService USER_SERVICE;
 
     private static final String INTERNAL_ERROR_MESSAGE = "Napotkano na nieoczekiwany błąd!";
 
@@ -40,7 +42,10 @@ public class TicketController
         
         try
         {
-            UUID userId = UUID.fromString(principal.getName());
+            UUID userId = USER_SERVICE.extractUserId(principal);
+            if(userId == null)
+                throw new UserNotFoundException("Nie odnaleziono Twoich danych!");
+
             AnalystTicketFormDTO form = AnalystTicketFormDTO.builder()
                     .description(ticket.getDescription())
                     .customer(ticket.getCustomer())
@@ -55,6 +60,20 @@ public class TicketController
             return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
         }
         catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @GetMapping("/employee/statistics")
+    @PreAuthorize("hasAuthority('EMPLOYEE')")
+    public ResponseEntity<?> getEmployeeReportStatistics(Principal principal)
+    {
+        try
+        {
+            return ResponseEntity.ok(this.TICKET_SERVICE.getUserReportStatistics(this.USER_SERVICE.extractUserId(principal)));
+        }
+        catch (Exception exception)
         {
             return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
         }

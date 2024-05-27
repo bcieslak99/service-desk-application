@@ -3,21 +3,25 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.ticke
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.AnalystTicketFormDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketDetailsForEmployeeDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketStatusStatistics;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketTypeStatisticsDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketCategory;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketStatus;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketType;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.tickets.TicketRepository;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.GroupsService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -75,5 +79,32 @@ public class TicketService
         ticket = this.TICKET_REPOSITORY.saveAndFlush(ticket);
 
         return ticket;
+    }
+
+    public TicketStatusStatistics getTicketStatusStatistics(List<Ticket> tickets)
+    {
+        if(tickets == null) return null;
+        TicketStatusStatistics statistics = new TicketStatusStatistics();
+        statistics.setPending(tickets.stream().filter(ticket -> ticket.getStatus().equals(TicketStatus.PENDING)).count());
+        statistics.setInProgress(tickets.stream().filter(ticket -> ticket.getStatus().equals(TicketStatus.IN_PROGRESS)).count());
+        statistics.setOnHold(tickets.stream().filter(ticket -> ticket.getStatus().equals(TicketStatus.ON_HOLD)).count());
+        statistics.setResolved(tickets.stream().filter(ticket -> ticket.getStatus().equals(TicketStatus.RESOLVED)).count());
+        return statistics;
+    }
+
+    public TicketTypeStatisticsDTO getUserReportStatistics(UUID userId)
+    {
+        List<Ticket> tickets = this.TICKET_REPOSITORY.getUserTicketsByUserIdAndTicketStatus(userId,
+                Arrays.asList(TicketStatus.PENDING, TicketStatus.IN_PROGRESS, TicketStatus.ON_HOLD, TicketStatus.RESOLVED));
+
+        TicketTypeStatisticsDTO statistics = new TicketTypeStatisticsDTO();
+
+        statistics.setIncidents(getTicketStatusStatistics(tickets.stream()
+                .filter(ticket -> ticket.getTicketType().equals(TicketType.INCIDENT)).collect(Collectors.toList())));
+
+        statistics.setServiceRequests(getTicketStatusStatistics(tickets.stream()
+                .filter(ticket -> ticket.getTicketType().equals(TicketType.SERVICE_REQUEST)).collect(Collectors.toList())));
+
+        return statistics;
     }
 }
