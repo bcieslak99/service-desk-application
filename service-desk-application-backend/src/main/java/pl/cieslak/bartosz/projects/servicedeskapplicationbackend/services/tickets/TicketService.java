@@ -2,6 +2,7 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.ticke
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.AnalystTicketFormDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketStatusStatistics;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketTypeStatisticsDTO;
@@ -10,6 +11,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.enti
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketStatus;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketType;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryIsDisabledException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.tickets.TicketRepository;
@@ -21,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +31,13 @@ public class TicketService
     private final TicketRepository TICKET_REPOSITORY;
     private final UserService USER_SERVICE;
     private final TicketCategoryService TICKET_CATEGORY_SERVICE;
+    private final TicketActivityService TICKET_ACTIVITY_SERVICE;
 
     private static final String USER_NOT_FOUND_MESSAGE = "Nie rozpoznano Twojego konta!";
     private static final String CUSTOMER_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego zgłaszającego!";
     private static final String REPORTER_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego użytkownika!";
     private static final String CATEGORY_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanej kategorii!";
+    private static final String CATEGORY_IS_DISABLED_MESSAGE = "Ta kategoria jest dezaktywowana!";
 
     private Ticket prepareTicket(String description, User reporter, User customer, TicketCategory category)
     {
@@ -52,6 +55,7 @@ public class TicketService
         return ticket;
     }
 
+    @Transactional
     public Ticket createTicket(UUID userId, AnalystTicketFormDTO ticketData) throws Exception
     {
         Optional<User> userInDataBase = this.USER_SERVICE.getUserById(userId);
@@ -74,9 +78,14 @@ public class TicketService
         User customer = customerInDatabase.get();
         TicketCategory category = categoryInDatabase.get();
 
+        if(!category.isCategoryIsActive())
+            throw new CategoryIsDisabledException(CATEGORY_IS_DISABLED_MESSAGE);
+
         Ticket ticket = prepareTicket(ticketData.getDescription(), reporter, customer, category);
 
         ticket = this.TICKET_REPOSITORY.saveAndFlush(ticket);
+
+        this.TICKET_ACTIVITY_SERVICE.addCreationActivity(ticket, reporter);
 
         return ticket;
     }

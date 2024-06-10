@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import {EmployeeHttpService} from "./employee-http.service";
-import {EmployeeTicketTypeStatistics} from "../../../models/ticket.interfaces";
+import {
+  EmployeeTicketForm,
+  EmployeeTicketTypeStatistics,
+  RegisteredTicket,
+  TicketCategory
+} from "../../../models/ticket.interfaces";
 import {NotifierService} from "angular-notifier";
+import {Observable} from "rxjs";
+import {UserAsListElement} from "../../../models/user-data.interfaces";
 
 @Injectable({
   providedIn: 'root'
@@ -35,5 +42,20 @@ export class EmployeePanelService
         this.notifier.notify("error", "Nie udało się pobrać danych na temat zgłoszeń!");
       }
     })
+  }
+
+  getTicketCategories(ticketType: string): Observable<TicketCategory[]>
+  {
+    return this.http.getCategoriesToRegisterTicket(ticketType);
+  }
+
+  getCustomers(): Observable<UserAsListElement[]>
+  {
+    return this.http.getCustomers();
+  }
+
+  registerTicketAsEmployee(ticketData: EmployeeTicketForm): Observable<RegisteredTicket>
+  {
+    return this.http.registerTicketAsEmployee(ticketData);
   }
 }

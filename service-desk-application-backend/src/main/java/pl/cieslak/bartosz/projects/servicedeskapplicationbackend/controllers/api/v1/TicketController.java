@@ -10,6 +10,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.AnalystTicketFormDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.EmployeeTicketFormDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryIsDisabledException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketActivityService;
@@ -55,7 +56,7 @@ public class TicketController
 
             return ResponseEntity.ok(this.TICKET_SERVICE.createTicket(userId, form).prepareDetailsForEmployee());
         }
-        catch(UserNotFoundException | CategoryNotFoundException exception)
+        catch(UserNotFoundException | CategoryNotFoundException | CategoryIsDisabledException exception)
         {
             return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
         }

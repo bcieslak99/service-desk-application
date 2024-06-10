@@ -114,7 +114,6 @@ export class EditGroupDataDialogComponent implements OnInit
       error: err => {
         let result: ServerResponsesMessage = err.error as ServerResponsesMessage;
         this.notifier.notify("error", result.message);
-        console.log(err.message)
       }
     });
   }

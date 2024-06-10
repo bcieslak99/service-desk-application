@@ -41,6 +41,7 @@ public class TicketActivity
     private String description;
 
     @NotNull
+    @Column(updatable = false)
     private LocalDateTime activityDate;
 
     @ManyToOne
@@ -50,4 +51,7 @@ public class TicketActivity
     @ManyToOne
     @JoinColumn(name = "ANALYST")
     private User analyst;
+
+    @Column(name = "USER_CAN_SEE", nullable = false)
+    private boolean userCanSee = false;
 }

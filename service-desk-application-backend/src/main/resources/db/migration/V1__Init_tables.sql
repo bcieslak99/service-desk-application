@@ -91,6 +91,7 @@ create table tickets_activities
     activity_date timestamp(6),
     ticket uuid not null,
     analyst uuid,
+    user_can_see boolean not null,
     primary key (id),
     foreign key (ticket) references tickets(id),
     foreign key (analyst) references users(id)
