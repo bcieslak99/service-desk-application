@@ -14,4 +14,5 @@ public interface UserRepository
     List<User> getAllUsers();
     Optional<User> getUserById(UUID userId);
     List<User> getActiveUsers();
+    Optional<User> getUserAndGroupsById(UUID userId);
 }

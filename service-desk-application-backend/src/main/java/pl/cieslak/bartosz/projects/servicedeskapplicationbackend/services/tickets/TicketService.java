@@ -3,7 +3,9 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.ticke
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.UserEntityDetails;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.AnalystTicketFormDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketAsListElementDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketStatusStatistics;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketTypeStatisticsDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
@@ -13,15 +15,14 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.enti
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryIsDisabledException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryNotFoundException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.EndpointNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.tickets.TicketRepository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +39,48 @@ public class TicketService
     private static final String REPORTER_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego użytkownika!";
     private static final String CATEGORY_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanej kategorii!";
     private static final String CATEGORY_IS_DISABLED_MESSAGE = "Ta kategoria jest dezaktywowana!";
+    private static final String BAD_TICKET_STATUS_MESSAGE = "Wybrany status zgłoszenia nie istnieje!";
+    private static final String BAD_TICKET_TYPE_MESSAGE = "Wybrany status zgłoszenia nie istnieje!";
+
+    public TicketType extractTicketType(String ticketType)
+    {
+        if(ticketType == null) return null;
+
+        return switch (ticketType.trim()) {
+            case "service" -> TicketType.SERVICE_REQUEST;
+            case "problem" -> TicketType.PROBLEM;
+            case "incident" -> TicketType.INCIDENT;
+            default -> null;
+        };
+    }
+
+    public TicketStatus extractTicketStatus(String ticketStatus)
+    {
+        if(ticketStatus == null) return null;
+
+        return switch(ticketStatus.trim()) {
+            case "pending" -> TicketStatus.PENDING;
+            case "progress" -> TicketStatus.IN_PROGRESS;
+            case "hold" -> TicketStatus.ON_HOLD;
+            case "resolved" -> TicketStatus.RESOLVED;
+            case "closed" -> TicketStatus.CLOSED;
+            default -> null;
+        };
+    }
+
+    public TicketAsListElementDTO prepareTicketAsListElement(Ticket ticket)
+    {
+        if(ticket == null) return null;
+        return TicketAsListElementDTO
+                .builder()
+                .id(ticket.getId())
+                .ticketStatus(ticket.getStatus())
+                .ticketType(ticket.getTicketType())
+                .description(ticket.getDescription())
+                .customer(this.USER_SERVICE.prepareUserDetails(ticket.getCustomer()))
+                .reporter(this.USER_SERVICE.prepareUserDetails(ticket.getReporter()))
+                .build();
+    }
 
     private Ticket prepareTicket(String description, User reporter, User customer, TicketCategory category)
     {
@@ -115,5 +158,25 @@ public class TicketService
                 .filter(ticket -> ticket.getTicketType().equals(TicketType.SERVICE_REQUEST)).collect(Collectors.toList())));
 
         return statistics;
+    }
+
+    public List<TicketAsListElementDTO> getUserTickets(Principal principal, String ticketType, String ticketStatus) throws Exception
+    {
+        UUID userId = this.USER_SERVICE.extractUserId(principal);
+        if(userId == null)
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        TicketType type = extractTicketType(ticketType);
+        TicketStatus status = extractTicketStatus(ticketStatus);
+
+        if(type == null || status == null)
+            throw new EndpointNotFoundException(type == null ? BAD_TICKET_TYPE_MESSAGE : BAD_TICKET_STATUS_MESSAGE);
+
+        List<Ticket> ticketsInDatabase = this.TICKET_REPOSITORY.getTicketsByTypeAndStatus(userId, type, status);
+        List<TicketAsListElementDTO> tickets = new ArrayList<>();
+
+        ticketsInDatabase.forEach(ticket -> tickets.add(prepareTicketAsListElement(ticket)));
+
+        return tickets.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 }
