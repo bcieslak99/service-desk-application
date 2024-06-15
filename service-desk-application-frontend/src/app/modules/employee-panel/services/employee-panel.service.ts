@@ -3,8 +3,8 @@ import {EmployeeHttpService} from "./employee-http.service";
 import {
   EmployeeTicketForm,
   EmployeeTicketTypeStatistics,
-  RegisteredTicket,
-  TicketCategory
+  Ticket,
+  TicketCategory, TicketStatus, TicketType
 } from "../../../models/ticket.interfaces";
 import {NotifierService} from "angular-notifier";
 import {Observable} from "rxjs";
@@ -54,8 +54,13 @@ export class EmployeePanelService
     return this.http.getCustomers();
   }
 
-  registerTicketAsEmployee(ticketData: EmployeeTicketForm): Observable<RegisteredTicket>
+  registerTicketAsEmployee(ticketData: EmployeeTicketForm): Observable<Ticket>
   {
     return this.http.registerTicketAsEmployee(ticketData);
+  }
+
+  getUserTickets(ticketType: TicketType, ticketStatus: TicketStatus): Observable<Ticket[]>
+  {
+    return this.http.getUserTickets(ticketType, ticketStatus);
   }
 }

@@ -32,7 +32,23 @@ export interface EmployeeTicketForm
   description: string
 }
 
-export interface RegisteredTicket
+export enum TicketType
+{
+  SERVICE_REQUEST,
+  INCIDENT,
+  PROBLEM
+}
+
+export enum TicketStatus
+{
+  PENDING,
+  IN_PROGRESS,
+  ON_HOLD,
+  RESOLVED,
+  CLOSED
+}
+
+export interface Ticket
 {
   id: string,
   ticketType: string,
@@ -48,4 +64,11 @@ export interface RegisteredTicket
     name: string,
     description: string
   }
+}
+
+export interface DataOfTicketsForEmployeeList
+{
+  customer: string,
+  openDate: Date;
+  category: string
 }

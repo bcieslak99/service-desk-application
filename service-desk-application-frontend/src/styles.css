@@ -10,3 +10,9 @@ body
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
+
+.table-container
+{
+  width: 100%;
+  overflow: auto;
+}

@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.UserEntityDetails;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.AnalystTicketFormDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketAsListElementDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketStatusStatistics;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketTypeStatisticsDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.CategoryDetailsForEmployeeDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketCategory;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketStatus;
@@ -66,6 +64,29 @@ public class TicketService
             case "closed" -> TicketStatus.CLOSED;
             default -> null;
         };
+    }
+
+    public TicketDetailsForEmployeeDTO prepareTicketDetailsForEmployee(Ticket ticket)
+    {
+        return TicketDetailsForEmployeeDTO
+                .builder()
+                .id(ticket.getId())
+                .ticketType(ticket.getTicketType())
+                .description(ticket.getDescription())
+                .customer(this.USER_SERVICE.prepareUserDetails(ticket.getCustomer()))
+                .reporter(this.USER_SERVICE.prepareUserDetails(ticket.getReporter()))
+                .status(ticket.getStatus())
+                .openDate(ticket.getOpenDate())
+                .resolveDate(ticket.getResolveDate())
+                .closeDate(ticket.getCloseDate())
+                .category(
+                        CategoryDetailsForEmployeeDTO
+                        .builder()
+                        .id(ticket.getCategory().getId())
+                        .name(ticket.getCategory().getName())
+                        .description(ticket.getCategory().getDescription())
+                        .build()
+                ).build();
     }
 
     public TicketAsListElementDTO prepareTicketAsListElement(Ticket ticket)
@@ -160,7 +181,7 @@ public class TicketService
         return statistics;
     }
 
-    public List<TicketAsListElementDTO> getUserTickets(Principal principal, String ticketType, String ticketStatus) throws Exception
+    public List<TicketDetailsForEmployeeDTO> getUserTickets(Principal principal, String ticketType, String ticketStatus) throws Exception
     {
         UUID userId = this.USER_SERVICE.extractUserId(principal);
         if(userId == null)
@@ -173,9 +194,9 @@ public class TicketService
             throw new EndpointNotFoundException(type == null ? BAD_TICKET_TYPE_MESSAGE : BAD_TICKET_STATUS_MESSAGE);
 
         List<Ticket> ticketsInDatabase = this.TICKET_REPOSITORY.getTicketsByTypeAndStatus(userId, type, status);
-        List<TicketAsListElementDTO> tickets = new ArrayList<>();
+        List<TicketDetailsForEmployeeDTO> tickets = new ArrayList<>();
 
-        ticketsInDatabase.forEach(ticket -> tickets.add(prepareTicketAsListElement(ticket)));
+        ticketsInDatabase.forEach(ticket -> tickets.add(prepareTicketDetailsForEmployee(ticket)));
 
         return tickets.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }

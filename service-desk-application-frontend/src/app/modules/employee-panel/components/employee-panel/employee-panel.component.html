@@ -36,19 +36,19 @@
             <div>
               <div class="ticket-title">Incydenty:</div>
               <div class="mt-1">
-                <a class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Oczekujące na realizację: {{getEmployeeTicketStatistics().incidents.pending}}</a>
-                <a class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>W trakcie realizacji: {{getEmployeeTicketStatistics().incidents.inProgress}}</a>
-                <a class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Wstrzymane: {{getEmployeeTicketStatistics().incidents.onHold}}</a>
-                <a class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Rozwiązane: {{getEmployeeTicketStatistics().incidents.resolved}}</a>
+                <a (click)="showTickets(TicketType.INCIDENT, TicketStatus.PENDING)" class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Oczekujące na realizację: {{getEmployeeTicketStatistics().incidents.pending}}</a>
+                <a (click)="showTickets(TicketType.INCIDENT, TicketStatus.IN_PROGRESS)" class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>W trakcie realizacji: {{getEmployeeTicketStatistics().incidents.inProgress}}</a>
+                <a (click)="showTickets(TicketType.INCIDENT, TicketStatus.ON_HOLD)" class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Wstrzymane: {{getEmployeeTicketStatistics().incidents.onHold}}</a>
+                <a (click)="showTickets(TicketType.INCIDENT, TicketStatus.RESOLVED)" class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Rozwiązane: {{getEmployeeTicketStatistics().incidents.resolved}}</a>
               </div>
             </div>
             <div class="mt-3">
               <div class="ticket-title">Wnioski o usługę:</div>
               <div class="mt-1">
-                <a class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Oczekujące na realizację: {{getEmployeeTicketStatistics().serviceRequests.pending}}</a>
-                <a class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>W trakcie realizacji: {{getEmployeeTicketStatistics().serviceRequests.inProgress}}</a>
-                <a class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Wstrzymane: {{getEmployeeTicketStatistics().serviceRequests.onHold}}</a>
-                <a class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Rozwiązane: {{getEmployeeTicketStatistics().serviceRequests.resolved}}</a>
+                <a (click)="showTickets(TicketType.SERVICE_REQUEST, TicketStatus.PENDING)" class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Oczekujące na realizację: {{getEmployeeTicketStatistics().serviceRequests.pending}}</a>
+                <a (click)="showTickets(TicketType.SERVICE_REQUEST, TicketStatus.IN_PROGRESS)" class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>W trakcie realizacji: {{getEmployeeTicketStatistics().serviceRequests.inProgress}}</a>
+                <a (click)="showTickets(TicketType.SERVICE_REQUEST, TicketStatus.ON_HOLD)" class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Wstrzymane: {{getEmployeeTicketStatistics().serviceRequests.onHold}}</a>
+                <a (click)="showTickets(TicketType.SERVICE_REQUEST, TicketStatus.RESOLVED)" class="mx-2 mt-3 mt-lg-2" type="button" mat-raised-button>Rozwiązane: {{getEmployeeTicketStatistics().serviceRequests.resolved}}</a>
               </div>
             </div>
             <div class="mt-3">
@@ -99,5 +99,8 @@
         </mat-card-content>
       </mat-card>
     </div>
+  </div>
+  <div class="mt-5">
+    <app-ticket-list *ngIf="titleOfTicketsPanel !== null && ticketsToShow !== null" [title]="titleOfTicketsPanel" [tickets]="ticketsToShow"></app-ticket-list>
   </div>
 </div>

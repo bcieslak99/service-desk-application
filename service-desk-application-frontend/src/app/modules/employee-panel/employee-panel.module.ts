@@ -13,25 +13,35 @@ import {MatInputModule} from "@angular/material/input";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {ReactiveFormsModule} from "@angular/forms";
 import {MatDialogModule} from "@angular/material/dialog";
+import { TicketListComponent } from './components/ticket-list/ticket-list.component';
+import {MatMenuModule} from "@angular/material/menu";
+import {MatPaginatorModule} from "@angular/material/paginator";
+import {MatSortModule} from "@angular/material/sort";
+import {MatTableModule} from "@angular/material/table";
 
 @NgModule({
   declarations: [
     EmployeePanelComponent,
     CreateTicketPanelComponent,
     IncidentCreatePanelComponent,
-    ServiceCreatePanelComponent
+    ServiceCreatePanelComponent,
+    TicketListComponent
   ],
-  imports: [
-    CommonModule,
-    EmployeePanelRoutingModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    SharedModule,
-    MatInputModule,
-    MatAutocompleteModule,
-    ReactiveFormsModule,
-    MatDialogModule
-  ]
+    imports: [
+        CommonModule,
+        EmployeePanelRoutingModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        SharedModule,
+        MatInputModule,
+        MatAutocompleteModule,
+        ReactiveFormsModule,
+        MatDialogModule,
+        MatMenuModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatTableModule
+    ]
 })
 export class EmployeePanelModule { }
