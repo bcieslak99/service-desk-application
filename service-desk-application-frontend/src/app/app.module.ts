@@ -48,4 +48,4 @@ const notifierConfig: NotifierOptions = {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

@@ -101,4 +101,24 @@ export class AuthService
     if(this.userLogged === null) return []
     else return this.userLogged.roles;
   }
+
+  userIsEmployee(): boolean
+  {
+    return this.getUserRoles().filter(element => element === "EMPLOYEE").length > 0;
+  }
+
+  userIsFirstLineAnalyst(): boolean
+  {
+    return this.getUserRoles().filter(element => element === "FIRST_LINE_ANALYST").length > 0;
+  }
+
+  userIsSecondLineAnalyst(): boolean
+  {
+    return this.getUserRoles().filter(element => element === "SECOND_LINE_ANALYST").length > 0;
+  }
+
+  userIsSystemAdministrator(): boolean
+  {
+    return this.getUserRoles().filter(element => element === "SYSTEM_ADMINISTRATOR").length > 0;
+  }
 }

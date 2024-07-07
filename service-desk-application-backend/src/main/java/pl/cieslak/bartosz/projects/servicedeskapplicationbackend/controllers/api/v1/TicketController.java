@@ -2,6 +2,7 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.controllers.ap
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -13,6 +14,8 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryIsDisabledException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.EndpointNotFoundException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.PermissionDeniedException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketActivityService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketCategoryService;
@@ -20,6 +23,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.ticket
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
 import java.security.Principal;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -68,7 +72,7 @@ public class TicketController
     }
 
     @GetMapping("/employee/list/{ticketType}/{ticketStatus}")
-    @PreAuthorize("hasAuthority('EMPLOYEE')")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
     ResponseEntity<?> getTickets(@PathVariable("ticketStatus") String ticketStatus, @PathVariable("ticketType") String ticketType, Principal principal)
     {
         try
@@ -94,6 +98,50 @@ public class TicketController
             return ResponseEntity.ok(this.TICKET_SERVICE.getUserReportStatistics(this.USER_SERVICE.extractUserId(principal)));
         }
         catch (Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @GetMapping("/details/{id}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<?> getTicketDetails(Principal principal, @PathVariable("id") UUID ticketId)
+    {
+        try
+        {
+            Optional<?> details = this.TICKET_SERVICE.getTicketDetails(principal, ticketId);
+            if(details.isEmpty())
+                throw new Exception();
+
+            return ResponseEntity.ok(details.get());
+        }
+        catch(UserNotFoundException | TicketNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(PermissionDeniedException exception)
+        {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @GetMapping("/permissions/{id}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<?> getInformationAboutPermissions(@PathVariable("id") UUID ticketId, Principal principal)
+    {
+        try
+        {
+            return ResponseEntity.ok(this.TICKET_SERVICE.getInformationAboutPermissions(principal, ticketId));
+        }
+        catch(TicketNotFoundException | UserNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
         {
             return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
         }

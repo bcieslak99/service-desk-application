@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Component;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.UserContactDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.UserDetailsDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
@@ -102,6 +103,18 @@ public class User
     public UserDetailsDTO prepareUserDetails()
     {
         return UserDetailsDTO.builder()
+                .userId(this.getId())
+                .name(this.getName())
+                .surname(this.getSurname())
+                .mail(this.getMail())
+                .phoneNumber(this.getPhoneNumber())
+                .userActive(this.isActive())
+                .build();
+    }
+
+    public UserContactDTO prepareUserContact()
+    {
+        return UserContactDTO.builder()
                 .userId(this.getId())
                 .name(this.getName())
                 .surname(this.getSurname())

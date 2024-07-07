@@ -53,21 +53,21 @@ public class TicketCategoryController
     }
 
     @GetMapping("/list/active/serviceRequests")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
     public ResponseEntity<List<CategoryDetailsDTO>> getActiveCategoriesForServiceRequests()
     {
         return ResponseEntity.ok(this.TICKET_CATEGORY_SERVICE.getActiveCategoriesByTicketType(TicketType.SERVICE_REQUEST));
     }
 
     @GetMapping("/list/active/incidents")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
     public ResponseEntity<List<CategoryDetailsDTO>> getActiveCategoriesForIncidents()
     {
         return ResponseEntity.ok(this.TICKET_CATEGORY_SERVICE.getActiveCategoriesByTicketType(TicketType.INCIDENT));
     }
 
     @GetMapping("/list/active/problems")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
     public ResponseEntity<List<CategoryDetailsDTO>> getActiveCategoriesForProblems()
     {
         return ResponseEntity.ok(this.TICKET_CATEGORY_SERVICE.getActiveCategoriesByTicketType(TicketType.PROBLEM));

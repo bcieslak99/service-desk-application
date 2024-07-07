@@ -3,6 +3,7 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.ent
 public enum TicketActivityType
 {
     CREATE_TICKET,
+    COMMENT,
     INTERNAL_NOTE,
     ASSIGN_INDIVIDUAL,
     ASSIGN_GROUP,

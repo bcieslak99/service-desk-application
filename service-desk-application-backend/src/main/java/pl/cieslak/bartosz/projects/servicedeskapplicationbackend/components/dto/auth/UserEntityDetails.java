@@ -89,11 +89,4 @@ public class UserEntityDetails implements UserDetails
     {
         return this.isEnabled;
     }
-
-    public boolean userIsAnalyst()
-    {
-        return this.authorities.stream()
-                .anyMatch(authority -> authority.getAuthority().equals(SecurityConfiguration.FIRST_LINE_ANALYST_ROLE_NAME) ||
-                        authority.getAuthority().equals(SecurityConfiguration.SECOND_LINE_ANALYST_ROLE_NAME));
-    }
 }

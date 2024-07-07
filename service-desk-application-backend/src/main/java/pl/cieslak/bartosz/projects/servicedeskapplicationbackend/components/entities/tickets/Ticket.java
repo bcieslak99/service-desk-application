@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.activities.TicketActivityAsListElement;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketDetailsForAnalystDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketDetailsForEmployeeDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
@@ -80,7 +82,7 @@ public class Ticket
 
     public TicketDetailsForEmployeeDTO prepareDetailsForEmployee()
     {
-        return TicketDetailsForEmployeeDTO.builder()
+        TicketDetailsForEmployeeDTO details = TicketDetailsForEmployeeDTO.builder()
                 .id(this.id)
                 .ticketType(this.ticketType)
                 .description(this.description)
@@ -92,21 +94,56 @@ public class Ticket
                 .closeDate(this.closeDate)
                 .category(this.category.prepareCategoryDetailsForEmployee())
                 .build();
+
+        List<TicketActivityAsListElement> activities = new ArrayList<>();
+        this.ticketActivities.forEach(element -> {
+            if(element.isUserCanSee())
+            {
+                TicketActivityAsListElement activity = new TicketActivityAsListElement();
+                activity.setId(element.getId());
+                activity.setTicketActivityType(element.getTicketActivityType());
+                activity.setDescription(element.getDescription());
+                activity.setActivityDate(element.getActivityDate());
+                activity.setAnalyst(element.getAnalyst().prepareUserDetails());
+                activities.add(activity);
+            }
+        });
+
+        details.setActivities(activities);
+
+        return details;
     }
 
-    public TicketDetailsForEmployeeDTO prepareDetailsForAnalyst()
+    public TicketDetailsForAnalystDTO prepareDetailsForAnalyst()
     {
-        return TicketDetailsForEmployeeDTO.builder()
+        TicketDetailsForAnalystDTO details = TicketDetailsForAnalystDTO.builder()
                 .id(this.id)
                 .ticketType(this.ticketType)
                 .description(this.description)
                 .customer(this.customer.prepareUserDetails())
                 .reporter(this.reporter.prepareUserDetails())
+                .assigneeAnalyst(this.assigneeAnalyst != null ? this.assigneeAnalyst.prepareUserDetails() : null)
+                .assigneeGroup(this.assigneeGroup.prepareGroupDetails())
                 .status(this.status)
                 .openDate(this.openDate)
                 .resolveDate(this.resolveDate)
                 .closeDate(this.closeDate)
                 .category(this.category.prepareCategoryDetailsForEmployee())
                 .build();
+
+        List<TicketActivityAsListElement> activities = new ArrayList<>();
+        this.ticketActivities.forEach(element -> {
+            TicketActivityAsListElement activity = new TicketActivityAsListElement();
+            activity.setId(element.getId());
+            activity.setTicketActivityType(element.getTicketActivityType());
+            activity.setDescription(element.getDescription());
+            activity.setActivityDate(element.getActivityDate());
+            activity.setAnalyst(element.getAnalyst().prepareUserDetails());
+            activities.add(activity);
+        });
+
+        details.setActivities(activities);
+
+        return details;
     }
 }

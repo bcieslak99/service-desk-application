@@ -10,22 +10,30 @@ import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import { SelectingUserDialogComponent } from './components/dialogs/selecting-user-dialog/selecting-user-dialog.component';
+import { TicketDetailsComponent } from './components/ticket-details/ticket-details.component';
+import {SharedRouting} from "./shared-routing";
+import {MatCardModule} from "@angular/material/card";
+import {MatMenuModule} from "@angular/material/menu";
 
 @NgModule({
   declarations: [
     SelectingCategoryDialogComponent,
-    SelectingUserDialogComponent
+    SelectingUserDialogComponent,
+    TicketDetailsComponent
   ],
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatInputModule,
-    FormsModule,
-    MatTableModule,
-    MatSortModule,
-    MatPaginatorModule,
-    MatButtonModule,
-    MatIconModule
-  ]
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        MatInputModule,
+        FormsModule,
+        MatTableModule,
+        MatSortModule,
+        MatPaginatorModule,
+        MatButtonModule,
+        MatIconModule,
+        SharedRouting,
+        MatCardModule,
+        MatMenuModule
+    ]
 })
 export class SharedModule { }

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
 import {
-  userHasNotPermissions,
+  userHasNotPermissions, userIsEmployeeOrAnalyst,
   userIsLoggedInGuard,
   userIsNotAdministrator,
   userIsNotAnalyst,
@@ -34,6 +34,11 @@ const routes: Routes = [
     path: "employee",
     loadChildren: () => import("../app/modules/employee-panel/employee-panel.module").then(m => m.EmployeePanelModule),
     canActivate: [userIsNotEmployeeGuard]
+  },
+  {
+    path: "ticket",
+    loadChildren: () => import("../app/modules/shared/shared.module").then(m => m.SharedModule),
+    canActivate: [userIsEmployeeOrAnalyst]
   },
   {
     path: "access/denied",

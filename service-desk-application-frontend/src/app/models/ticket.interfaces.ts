@@ -68,7 +68,72 @@ export interface Ticket
 
 export interface DataOfTicketsForEmployeeList
 {
+  id: string,
   customer: string,
   openDate: Date;
   category: string
+}
+
+export interface TicketActivity
+{
+  id: string,
+  ticketActivityType: string,
+  description: string,
+  activityDate: Date
+  analyst: UserAsListElement
+}
+
+export interface ActivityToShowInTable
+{
+  ticketActivityType: string,
+  description: string,
+  activityDate: Date,
+  analyst: string
+}
+
+export interface TicketDetailsForEmployee
+{
+  id: string,
+  ticketType: string,
+  description: string,
+  customer: UserAsListElement,
+  reporter: UserAsListElement,
+  status: string,
+  openDate: Date,
+  resolveDate: Date | null,
+  closeDate: Date | null
+  category: {
+    id: string,
+    name: string,
+    description: string,
+  },
+  activities: TicketActivity[]
+}
+
+export interface TicketDetailsForAnalyst
+{
+  id: string,
+  ticketType: string,
+  description: string,
+  customer: UserAsListElement,
+  reporter: UserAsListElement,
+  assigneeAnalyst: UserAsListElement | null,
+  assigneeGroup: GroupData,
+  status: string,
+  openDate: Date,
+  resolveDate: Date | null,
+  closeDate: Date | null
+  category: {
+    id: string,
+    name: string,
+    description: string,
+  },
+  activities: TicketActivity[]
+}
+
+export interface PermissionsInformationAboutTicket
+{
+  accessAsEmployee: boolean,
+  accessAsFirstLineAnalyst: boolean,
+  accessAsSecondLineAnalyst: boolean
 }

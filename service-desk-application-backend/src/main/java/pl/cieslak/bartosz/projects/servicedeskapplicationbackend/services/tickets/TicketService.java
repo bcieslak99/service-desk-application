@@ -3,9 +3,10 @@ package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.ticke
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.UserEntityDetails;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.PermissionsToTicket;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.CategoryDetailsForEmployeeDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.*;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.GroupType;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketCategory;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketStatus;
@@ -14,6 +15,8 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.enti
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryIsDisabledException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.EndpointNotFoundException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.PermissionDeniedException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.tickets.TicketRepository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
@@ -39,6 +42,8 @@ public class TicketService
     private static final String CATEGORY_IS_DISABLED_MESSAGE = "Ta kategoria jest dezaktywowana!";
     private static final String BAD_TICKET_STATUS_MESSAGE = "Wybrany status zgłoszenia nie istnieje!";
     private static final String BAD_TICKET_TYPE_MESSAGE = "Wybrany status zgłoszenia nie istnieje!";
+    private static final String TICKET_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego zgłoszenia!";
+    private static final String PERMISSION_DENIED_MESSAGE = "Nie masz dostępu do tego zasobu!";
 
     public TicketType extractTicketType(String ticketType)
     {
@@ -87,20 +92,6 @@ public class TicketService
                         .description(ticket.getCategory().getDescription())
                         .build()
                 ).build();
-    }
-
-    public TicketAsListElementDTO prepareTicketAsListElement(Ticket ticket)
-    {
-        if(ticket == null) return null;
-        return TicketAsListElementDTO
-                .builder()
-                .id(ticket.getId())
-                .ticketStatus(ticket.getStatus())
-                .ticketType(ticket.getTicketType())
-                .description(ticket.getDescription())
-                .customer(this.USER_SERVICE.prepareUserDetails(ticket.getCustomer()))
-                .reporter(this.USER_SERVICE.prepareUserDetails(ticket.getReporter()))
-                .build();
     }
 
     private Ticket prepareTicket(String description, User reporter, User customer, TicketCategory category)
@@ -199,5 +190,82 @@ public class TicketService
         ticketsInDatabase.forEach(ticket -> tickets.add(prepareTicketDetailsForEmployee(ticket)));
 
         return tickets.stream().filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public boolean userHasAccessAsEmployeeToTicket(UUID userId, UUID ticketId) throws TicketNotFoundException
+    {
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketGroupAndReporterByTicketId(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+        return ticket.getReporter().getId().equals(userId);
+    }
+
+    public boolean userHasAccessAsFirstLineAnalyst(UUID userId) throws UserNotFoundException
+    {
+        if(userId == null)
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(userId);
+        if(userInDatabase.isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        User user = userInDatabase.get();
+
+        return user.getUserGroups().stream().anyMatch(element -> element.getGroupType().equals(GroupType.FIRST_LINE));
+    }
+
+    public boolean userHasAccessAsSecondLineAnalyst(UUID userId, UUID ticketId) throws UserNotFoundException, TicketNotFoundException
+    {
+        if(userId == null)
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        if(ticketId == null)
+            throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(userId);
+        if(userInDatabase.isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketGroupAndReporterByTicketId(ticketId);
+        if(ticketInDatabase.isEmpty())
+            throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+
+        User user = userInDatabase.get();
+        Ticket ticket = ticketInDatabase.get();
+
+        return user.getUserGroups().stream().anyMatch(group -> group.getId().equals(ticket.getAssigneeGroup().getId()));
+    }
+
+    public Optional<?> getTicketDetails(Principal whoWants, UUID ticketId) throws UserNotFoundException, TicketNotFoundException, PermissionDeniedException
+    {
+        if(whoWants == null || whoWants.getName() == null || whoWants.getName().trim().isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        if(ticketId == null)
+            throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+
+        boolean hasAccessAsEmployee = userHasAccessAsEmployeeToTicket(this.USER_SERVICE.extractUserId(whoWants), ticketId);
+        boolean hasAccessAsFirstLineAnalyst = userHasAccessAsFirstLineAnalyst(this.USER_SERVICE.extractUserId(whoWants));
+        boolean hasAccessAsSecondLineAnalyst = userHasAccessAsSecondLineAnalyst(this.USER_SERVICE.extractUserId(whoWants), ticketId);
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty())
+            throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+
+        Ticket ticket = ticketInDatabase.get();
+
+        if(hasAccessAsFirstLineAnalyst || hasAccessAsSecondLineAnalyst) return Optional.of(ticket.prepareDetailsForAnalyst());
+        else if(hasAccessAsEmployee) return Optional.of(ticket.prepareDetailsForEmployee());
+        else throw new PermissionDeniedException(PERMISSION_DENIED_MESSAGE);
+    }
+
+    public PermissionsToTicket getInformationAboutPermissions(Principal whoWants, UUID ticketId) throws TicketNotFoundException, UserNotFoundException
+    {
+        UUID userId = this.USER_SERVICE.extractUserId(whoWants);
+        PermissionsToTicket permissions = new PermissionsToTicket();
+        permissions.setAccessAsEmployee(userHasAccessAsEmployeeToTicket(userId, ticketId));
+        permissions.setAccessAsFirstLineAnalyst(userHasAccessAsFirstLineAnalyst(userId));
+        permissions.setAccessAsSecondLineAnalyst(userHasAccessAsSecondLineAnalyst(userId, ticketId));
+        return permissions;
     }
 }

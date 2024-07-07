@@ -27,7 +27,7 @@
 
           <ng-container matColumnDef="action">
             <th mat-header-cell *matHeaderCellDef>Akcje</th>
-            <td mat-cell *matCellDef="let row"><a mat-raised-button color="primary">Szczegóły</a></td>
+            <td mat-cell *matCellDef="let row"><a [routerLink]="['/ticket', row.id]" mat-raised-button color="primary"><mat-icon>description</mat-icon> Szczegóły</a></td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

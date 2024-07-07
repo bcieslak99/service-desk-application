@@ -1,8 +1,9 @@
-import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, Input, ViewChild} from '@angular/core';
 import {DataOfTicketsForEmployeeList, Ticket} from "../../../../models/ticket.interfaces";
 import {MatTableDataSource} from "@angular/material/table";
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
+import {Router,} from "@angular/router";
 
 @Component({
   selector: 'app-ticket-list',
@@ -18,6 +19,8 @@ export class TicketListComponent implements AfterViewInit
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  constructor(private router: Router) {}
+
   prepareData(): void
   {
     let list: DataOfTicketsForEmployeeList[] = [];
@@ -26,7 +29,8 @@ export class TicketListComponent implements AfterViewInit
       list.push({
         category: element.category.name,
         customer: element.customer.surname + " " + element.customer.name + " (" + element.customer.mail + ")",
-        openDate: new Date(element.openDate)
+        openDate: new Date(element.openDate),
+        id: element.id
       })
     });
 
