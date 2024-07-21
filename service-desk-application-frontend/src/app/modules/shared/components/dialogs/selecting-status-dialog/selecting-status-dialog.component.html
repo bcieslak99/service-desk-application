@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>Wybierz status</h2>
+<mat-dialog-content class="mat-typography" style="min-width: 600px">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-12">
+
+        <mat-form-field style="width: 100%;" class="mb-3">
+          <mat-label>Komentarz</mat-label>
+          <textarea [(ngModel)]="comment" style="max-height: 400px; overflow: auto;" maxlength="1000" matInput placeholder="Podaj komentarz"></textarea>
+        </mat-form-field>
+
+        <div class="mat-elevation-z">
+          <table mat-table [dataSource]="statusTableSource">
+
+            <ng-container matColumnDef="status" class="col-4">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let row">{{row.polishVersion}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Aktywności</th>
+              <td mat-cell *matCellDef="let row">
+                <button mat-raised-button color="primary" (click)="selectStatus(row.ticketStatus)">
+                  <mat-icon>touch_app</mat-icon>
+                  Wybierz
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell" colspan="4">Brak danych do wyświetlenia</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="text-center mt-3">
+          <button mat-raised-button color="accent" (click)="closeDialog(null)">Zamknij okno</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>

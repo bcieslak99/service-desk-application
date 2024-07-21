@@ -7,18 +7,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.activities.TicketCommentDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.CategoryIdDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupIdDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.AnalystTicketFormDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.EmployeeTicketFormDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.ChangeTicketStatusDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketDescriptionDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.UserId;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryIsDisabledException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryNotFoundException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.groups.GroupNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.EndpointNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.PermissionDeniedException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketActivityException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketDescriptionException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketIsClosedException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketActivityService;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketCategoryService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
@@ -33,8 +41,6 @@ import java.util.UUID;
 public class TicketController
 {
     private final TicketService TICKET_SERVICE;
-    private final TicketCategoryService TICKET_CATEGORY_SERVICE;
-    private final TicketActivityService TICKET_ACTIVITY_SERVICE;
     private final UserService USER_SERVICE;
 
     private static final String INTERNAL_ERROR_MESSAGE = "Napotkano na nieoczekiwany błąd!";
@@ -138,6 +144,227 @@ public class TicketController
             return ResponseEntity.ok(this.TICKET_SERVICE.getInformationAboutPermissions(principal, ticketId));
         }
         catch(TicketNotFoundException | UserNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PostMapping("/user/change/{id}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> changeUser(@PathVariable("id") UUID ticketId, @Valid @RequestBody UserId userId, BindingResult errors, Principal principal)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Identyfikator użytkownika jest nieprawidłowy!", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.changeUser(principal, ticketId, userId.getUserId());
+            return ResponseEntity.ok(new ResponseMessage("Użytkownik został zmieniony", ResponseCode.SUCCESS));
+        }
+        catch(UserNotFoundException | TicketNotFoundException | TicketActivityException | TicketIsClosedException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PostMapping("/reporter/change/{id}")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> changeReporter(@PathVariable("id") UUID ticketId, @Valid @RequestBody UserId userId, BindingResult errors, Principal principal)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Identyfikator użytkownika jest nieprawidłowy!", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.changeReporter(principal, ticketId, userId.getUserId());
+            return ResponseEntity.ok(new ResponseMessage("Użytkownik został zmieniony", ResponseCode.SUCCESS));
+        }
+        catch(UserNotFoundException | TicketNotFoundException | TicketActivityException |
+              TicketIsClosedException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PostMapping("/status/change/{id}")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> changeStatus(@PathVariable("id") UUID ticketId, @Valid @RequestBody ChangeTicketStatusDTO ticketStatus, BindingResult errors, Principal principal)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Wskazano nieprawidłowy status!", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.changeStatus(principal, ticketId, ticketStatus);
+            return ResponseEntity.ok(new ResponseMessage("Status został zmieniony.", ResponseCode.SUCCESS));
+        }
+        catch(TicketNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PostMapping("/activity/comment/add/{id}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> addComment(Principal principal, @PathVariable("id") UUID ticketId, @Valid @RequestBody TicketCommentDTO comment, BindingResult errors)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Treść komentarza jest nieprawidłowa!", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.addComment(principal, ticketId, comment.getComment());
+            return ResponseEntity.ok(new ResponseMessage("Komentarz został dodany.", ResponseCode.SUCCESS));
+        }
+        catch (UserNotFoundException | TicketNotFoundException | TicketActivityException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch (Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PostMapping("/activity/reminder/add/{id}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> addReminder(Principal principal, @PathVariable("id") UUID ticketId, @Valid @RequestBody TicketCommentDTO comment, BindingResult errors)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Treść komentarza jest nieprawidłowa!", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.addReminder(principal, ticketId, comment.getComment());
+            return ResponseEntity.ok(new ResponseMessage("Monit został dodany.", ResponseCode.SUCCESS));
+        }
+        catch (UserNotFoundException | TicketNotFoundException | TicketActivityException | PermissionDeniedException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch (Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PostMapping("/activity/note/add/{id}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> addInternaNote(Principal principal, @PathVariable("id") UUID ticketId, @Valid @RequestBody TicketCommentDTO comment, BindingResult errors)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Treść komentarza jest nieprawidłowa!", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.addInternalNote(principal, ticketId, comment.getComment());
+            return ResponseEntity.ok(new ResponseMessage("Notatka został dodany.", ResponseCode.SUCCESS));
+        }
+        catch (UserNotFoundException | TicketNotFoundException | TicketActivityException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch (Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PatchMapping("/category/change/{id}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> changeTicketCategory(@PathVariable("id") UUID ticketId, Principal principal, @Valid @RequestBody CategoryIdDTO categoryId, BindingResult errors)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Wskazano nieprawidłową kategorię!", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.changeTicketCategory(principal, ticketId, categoryId.getCategoryId());
+            return ResponseEntity.ok(new ResponseMessage("Notatka został dodany.", ResponseCode.SUCCESS));
+        }
+        catch (UserNotFoundException | TicketNotFoundException | TicketActivityException | CategoryNotFoundException | CategoryIsDisabledException | PermissionDeniedException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch (Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PatchMapping("/description/change/{id}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> changeTicketDescription(@PathVariable("id") UUID ticketId, Principal principal, @Valid @RequestBody TicketDescriptionDTO newDescription, BindingResult errors)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Nowy opis jest nieprawidłowy!", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.changeTicketDescription(principal, ticketId, newDescription.getDescription());
+            return ResponseEntity.ok(new ResponseMessage("Opis został zmieniony.", ResponseCode.SUCCESS));
+        }
+        catch(UserNotFoundException | TicketNotFoundException | TicketDescriptionException | TicketActivityException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PatchMapping("/assignee/analyst/change/{id}")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> changeAssigneeAnalyst(@PathVariable("id") UUID ticketId, Principal principal, @Valid @RequestBody UserId userId, BindingResult errors)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Nie podano identyfikatora użytkownika", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.changeAssigneePerson(ticketId, principal, userId.getUserId());
+            return ResponseEntity.ok(new ResponseMessage("Osoba realizująca została zmieniona", ResponseCode.SUCCESS));
+        }
+        catch(UserNotFoundException | TicketNotFoundException | TicketIsClosedException | TicketActivityException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @PatchMapping("/assignee/group/change/{id}")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> changeAssigneeGroup(@PathVariable("id") UUID ticketId, Principal principal, @Valid @RequestBody GroupIdDTO groupId, BindingResult errors)
+    {
+        if(errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Nie podano grupy, której należy przekazać zgłoszenie!", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_SERVICE.changeAssigneeGroup(ticketId, principal, groupId.getGroupId());
+            return ResponseEntity.ok(new ResponseMessage("Zgłoszenie zostało przekazane.", ResponseCode.SUCCESS));
+        }
+        catch(TicketNotFoundException | TicketIsClosedException | TicketActivityException | UserNotFoundException | GroupNotFoundException exception)
         {
             return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
         }

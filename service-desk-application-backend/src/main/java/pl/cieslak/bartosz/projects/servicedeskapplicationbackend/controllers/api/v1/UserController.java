@@ -31,7 +31,7 @@ public class UserController
     }
 
     @GetMapping("/list/active")
-    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMINISTRATOR', 'EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
     public ResponseEntity<List<UserDetailsDTO>> getActiveUsers()
     {
         return ResponseEntity.ok(this.USER_SERVICE.getActiveUsers());

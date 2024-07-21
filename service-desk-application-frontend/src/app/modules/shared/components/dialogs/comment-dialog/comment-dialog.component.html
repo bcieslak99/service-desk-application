@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>{{title}}</h2>
+<mat-dialog-content class="mat-typography">
+  <div class="dialog">
+    <mat-form-field class="col-12">
+      <mat-label>Komentarz</mat-label>
+      <textarea maxlength="1000" [(ngModel)]="comment" matInput placeholder="Dodaj komentarz do aktywności"></textarea>
+    </mat-form-field>
+  </div>
+  <div class="d-flex flex-wrap mt-3 justify-content-center text-center">
+    <button (click)="cancel()" class="me-3 mb-3" type="button" mat-raised-button color="warn"><mat-icon>cancel</mat-icon> Anuluj</button>
+    <button (click)="submit()" [disabled]="!commentIsCorrect()" class="me-3 mb-3" type="button" mat-raised-button color="primary"><mat-icon>check</mat-icon> Zatwierdź</button>
+  </div>
+</mat-dialog-content>

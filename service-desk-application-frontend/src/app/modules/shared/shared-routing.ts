@@ -6,7 +6,8 @@ const routes: Routes = [
     {
         path: ":id",
         pathMatch: "full",
-        component: TicketDetailsComponent
+        component: TicketDetailsComponent,
+        title: "Service Desk :: Podgląd Zgłoszenia"
     },
     {
         path: "**",

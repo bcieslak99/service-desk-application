@@ -32,6 +32,7 @@ interface TicketSQLRepository extends JpaRepository<Ticket, UUID>, TicketReposit
             "left join t.assigneeAnalyst as aa " +
             "left join fetch t.ticketActivities as ta " +
             "left join fetch ag.groupManager as gm " +
-            "where t.id = :id")
+            "where t.id = :id " +
+            "order by ta.activityDate desc")
     Optional<Ticket> getTicketDetailsById(@Param("id") UUID ticketId);
 }

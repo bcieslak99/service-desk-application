@@ -13,6 +13,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.GroupsService;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -109,7 +110,7 @@ public class GroupController
     }
 
     @GetMapping("/members/management/{id}")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMINISTRATOR', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
     public ResponseEntity<?> getMembersToModify(@PathVariable("id") UUID groupId)
     {
         return this.GROUP_SERVICE.getMembersToModify(groupId);
@@ -120,5 +121,19 @@ public class GroupController
     public ResponseEntity<ResponseMessage> setManager(@PathVariable("id") UUID groupId, @RequestBody UserId managerId)
     {
         return this.GROUP_SERVICE.changeGroupManager(groupId, managerId.getUserId());
+    }
+
+    @GetMapping("/user/list")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<?> getUserGroups(Principal principal)
+    {
+        return this.GROUP_SERVICE.getUserGroups(principal);
+    }
+
+    @GetMapping("/list/active")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMINISTRATOR', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<List<GroupDetailsDTO>> getActiveGroups()
+    {
+        return this.GROUP_SERVICE.getActiveGroups();
     }
 }

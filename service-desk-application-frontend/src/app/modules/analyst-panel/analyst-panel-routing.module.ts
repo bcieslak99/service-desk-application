@@ -11,7 +11,8 @@ const routes: Routes = [
   {
     path: "panel",
     pathMatch: "full",
-    component: AnalystPanelComponent
+    component: AnalystPanelComponent,
+    title: "Service Desk :: Panel Analityka"
   },
   {
     path: "**",

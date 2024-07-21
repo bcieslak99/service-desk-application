@@ -14,12 +14,18 @@ import { TicketDetailsComponent } from './components/ticket-details/ticket-detai
 import {SharedRouting} from "./shared-routing";
 import {MatCardModule} from "@angular/material/card";
 import {MatMenuModule} from "@angular/material/menu";
+import { SelectingStatusDialogComponent } from './components/dialogs/selecting-status-dialog/selecting-status-dialog.component';
+import { CommentDialogComponent } from './components/dialogs/comment-dialog/comment-dialog.component';
+import { SelectingGroupDialogComponent } from './components/dialogs/selecting-group-dialog/selecting-group-dialog.component';
 
 @NgModule({
   declarations: [
     SelectingCategoryDialogComponent,
     SelectingUserDialogComponent,
-    TicketDetailsComponent
+    TicketDetailsComponent,
+    SelectingStatusDialogComponent,
+    CommentDialogComponent,
+    SelectingGroupDialogComponent
   ],
     imports: [
         CommonModule,

@@ -13,17 +13,20 @@ const routes: Routes = [
   {
     path: "panel",
     pathMatch: 'full',
-    component: EmployeePanelComponent
+    component: EmployeePanelComponent,
+    title: "Service Desk :: Panel Pracownika"
   },
   {
     path: "ticket/incident/create",
     pathMatch: "full",
-    component: IncidentCreatePanelComponent
+    component: IncidentCreatePanelComponent,
+    title: "Service Desk :: Utworzenie Incydentu"
   },
   {
     path: "ticket/service/create",
     pathMatch: "full",
-    component: ServiceCreatePanelComponent
+    component: ServiceCreatePanelComponent,
+    title: "Service Desk :: Utworzenie Wniosku o Usługę"
   },
   {
     path: "**",

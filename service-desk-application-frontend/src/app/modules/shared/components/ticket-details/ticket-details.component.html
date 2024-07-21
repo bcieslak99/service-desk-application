@@ -1,5 +1,5 @@
 <div class="container-fluid" *ngIf="permissionsToTicket === null; else dataExists">
-  <div class="row justify-content-center text-center">
+  <div *ngIf="ticketExists === null; else existsInformation" class="row justify-content-center text-center">
     <div class="col-12 mt-5">
       <h1>System nie pobrał danych na temat zgłoszenia!</h1>
       <p>Jeżeli ten komunikat nie znika należy sprawdzić swoje połączenie z siecią lub w ostateczności skontaktować się administratorem!</p>
@@ -9,6 +9,16 @@
       </div>
     </div>
   </div>
+  <ng-template #existsInformation>
+    <div class="row justify-content-center text-center" *ngIf="ticketExists === false">
+      <div class="col-12 mt-5" >
+        <h1>Brak danych</h1>
+        <p>Nie odnaleziono zgłoszenia o wskazanym identyfikatorze</p>
+        <a *ngIf="userIsEmployee" class="mx-3" mat-raised-button routerLink="/employee/panel">Powrót do panlu pracownika</a>
+        <a *ngIf="userIsFirstLineAnalyst() || userIsSecondLineAnalyst()" class="mx-3" mat-raised-button routerLink="/analyst/panel">Powrót do panelu analityka</a>
+      </div>
+    </div>
+  </ng-template>
 </div>
 
 <ng-template #dataExists>
@@ -59,8 +69,8 @@
               </div>
             </mat-card-content>
             <mat-card-actions *ngIf="!ticketIsClosed()" class="d-flex flex-wrap mt-3">
-              <button mat-raised-button class="me-3 mb-3"><mat-icon>person</mat-icon> Zmień użytkownika</button>
-              <button mat-raised-button class="me-3 mb-3"><mat-icon>person</mat-icon> Zmień zgłaszającego</button>
+              <button type="button" mat-raised-button (click)="openDialogToChangeUser()" class="me-3 mb-3"><mat-icon>person</mat-icon> Zmień użytkownika</button>
+              <button type="button" *ngIf="userIsFirstLineAnalyst() || userIsSecondLineAnalyst()" (click)="openDialogToChangeReporter()" mat-raised-button class="me-3 mb-3"><mat-icon>person</mat-icon> Zmień zgłaszającego</button>
             </mat-card-actions>
           </mat-card>
         </div>
@@ -84,14 +94,14 @@
               </ng-template>
             </mat-card-content>
             <mat-card-actions *ngIf="!ticketIsClosed()" class="d-flex flex-wrap mt-3">
-              <button *ngIf="userIsFirstLineAnalyst() || userIsSecondLineAnalyst()" mat-raised-button class="me-3 mb-3"><mat-icon>switch_access_shortcut</mat-icon> Zmień status</button>
-              <button *ngIf="userIsFirstLineAnalyst() || userIsSecondLineAnalyst()" mat-raised-button class="me-3 mb-3"><mat-icon>category</mat-icon> Zmień kategorię</button>
-              <button *ngIf="userIsFirstLineAnalyst() || userIsSecondLineAnalyst()" mat-raised-button class="me-3 mb-3"><mat-icon>verified</mat-icon> Rozwiąż zgłoszenie</button>
-              <button mat-raised-button class="mb-3" [matMenuTriggerFor]="notes"><mat-icon>chat</mat-icon> Dodaj aktywność</button>
+              <button type="button" (click)="openDialogToChangeStatus()" *ngIf="(userIsFirstLineAnalyst() || userIsSecondLineAnalyst()) && userIsMemberOfAssigneeGroup()" mat-raised-button class="me-3 mb-3"><mat-icon>switch_access_shortcut</mat-icon> Zmień status</button>
+              <button type="button" (click)="changeCategory()" *ngIf="userIsFirstLineAnalyst() || userIsSecondLineAnalyst()" mat-raised-button class="me-3 mb-3"><mat-icon>category</mat-icon> Zmień kategorię</button>
+              <button type="button" (click)="resolveTicket()" *ngIf="(userIsFirstLineAnalyst() || userIsSecondLineAnalyst()) && !ticketIsResolved() && !ticketIsClosed() && userIsMemberOfAssigneeGroup()" mat-raised-button class="me-3 mb-3"><mat-icon>verified</mat-icon> Rozwiąż zgłoszenie</button>
+              <button type="button" mat-raised-button class="mb-3" [matMenuTriggerFor]="notes"><mat-icon>chat</mat-icon> Dodaj aktywność</button>
               <mat-menu #notes="matMenu">
-                <button mat-menu-item>Komentarz</button>
-                <button mat-menu-item>Monit</button>
-                <button *ngIf="userIsFirstLineAnalyst() || userIsSecondLineAnalyst()" mat-menu-item>Notatka wewnętrzna</button>
+                <button type="button" (click)="openDialogToAddComment()" mat-menu-item>Komentarz</button>
+                <button type="button" (click)="openDialogToAddReminder()" *ngIf="userIsFirstLineAnalyst() || permissionsToTicket?.accessAsEmployee" mat-menu-item>Monit</button>
+                <button type="button" (click)="openDialogToAddInternalNote()" *ngIf="userIsFirstLineAnalyst() || permissionsToTicket?.accessAsSecondLineAnalyst" mat-menu-item>Notatka wewnętrzna</button>
               </mat-menu>
             </mat-card-actions>
           </mat-card>
@@ -103,7 +113,7 @@
               <mat-card-title>Realizacja</mat-card-title>
             </mat-card-header>
             <mat-card-content class="mt-3">
-              <p><b>Grupa realizująca: </b> {{getTicketStatus()}}</p>
+              <p><b>Grupa realizująca: </b> {{getAssigneeGroup()}}</p>
               <p><b>Osoba realizująca: </b> {{getAssignedAnalyst()}}</p>
 
               <p class="mt-3">
@@ -112,9 +122,9 @@
                 Przed przekazaniem zgłoszenia do innej osoby upewnij się czy jest w pracy.
               </p>
             </mat-card-content>
-            <mat-card-actions *ngIf="!ticketIsClosed()" class="d-flex flex-wrap mt-3">
-              <button mat-raised-button class="me-3 mb-3"><mat-icon>person</mat-icon> Zmień grupę</button>
-              <button mat-raised-button class="me-3 mb-3"><mat-icon>group</mat-icon> Zmień realizującego</button>
+            <mat-card-actions *ngIf="!ticketIsResolved() && !ticketIsClosed()" class="d-flex flex-wrap mt-3">
+              <button type="button" (click)="openDialogToChangeGroup()" *ngIf="userIsMemberOfAssigneeGroup() || userIsFirstLineAnalyst" mat-raised-button class="me-3 mb-3"><mat-icon>person</mat-icon> Zmień grupę</button>
+              <button type="button" (click)="openDialogToChangeAssigneePerson()" *ngIf="userIsMemberOfAssigneeGroup()" mat-raised-button class="me-3 mb-3"><mat-icon>group</mat-icon> Zmień realizującego</button>
             </mat-card-actions>
           </mat-card>
         </div>
@@ -128,10 +138,10 @@
               <mat-card-title>Opis zgłoszenia</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-              <p>{{ticketDetails?.description}}</p>
+              <p [innerHTML]="showTicketDescription()"></p>
             </mat-card-content>
             <mat-card-actions *ngIf="!ticketIsClosed()" class="mt-3">
-              <button mat-raised-button class="me-3 mb-3"><mat-icon>edit</mat-icon> Edytuj opis</button>
+              <button type="button" (click)="openDialogToEditDescription()" mat-raised-button class="me-3 mb-3"><mat-icon>edit</mat-icon> Edytuj opis</button>
             </mat-card-actions>
           </mat-card>
         </div>
@@ -151,43 +161,45 @@
               </mat-form-field>
 
               <div class="mat-elevation-z1">
-                <table mat-table [dataSource]="listOfActivities" matSort>
+                <div class="table-container">
+                  <table mat-table [dataSource]="listOfActivities" matSort>
 
-                  <ng-container matColumnDef="activityDate">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Data</th>
-                    <td mat-cell *matCellDef="let row"> {{row.activityDate | date: 'dd.MM.yyyy HH:mm:ss'}} </td>
-                  </ng-container>
+                    <ng-container matColumnDef="activityDate">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header>Data</th>
+                      <td mat-cell *matCellDef="let row"> {{row.activityDate | date: 'dd.MM.yyyy HH:mm:ss'}} </td>
+                    </ng-container>
 
-                  <ng-container matColumnDef="ticketActivityType">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Typ</th>
-                    <td mat-cell *matCellDef="let row"> {{row.ticketActivityType}} </td>
-                  </ng-container>
+                    <ng-container matColumnDef="ticketActivityType">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header>Typ</th>
+                      <td mat-cell *matCellDef="let row"> {{row.ticketActivityType}} </td>
+                    </ng-container>
 
-                  <ng-container matColumnDef="analyst">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Użytkownik</th>
-                    <td mat-cell *matCellDef="let row"> {{row.analyst}} </td>
-                  </ng-container>
+                    <ng-container matColumnDef="analyst">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header>Użytkownik</th>
+                      <td mat-cell *matCellDef="let row"> {{row.analyst}} </td>
+                    </ng-container>
 
-                  <ng-container matColumnDef="description">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Opis</th>
-                    <td mat-cell *matCellDef="let row"> {{row.description}} </td>
-                  </ng-container>
+                    <ng-container matColumnDef="description">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header>Opis</th>
+                      <td mat-cell *matCellDef="let row"> {{row.description}} </td>
+                    </ng-container>
 
-                  <ng-container matColumnDef="active">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Czy aktywna</th>
-                    <td mat-cell *matCellDef="let row">
-                      <span *ngIf="row.groupActive === true; else noActiveGroup" class="status active-group">TAK</span>
-                      <ng-template #noActiveGroup><span class="status no-active-group">NIE</span></ng-template>
-                    </td>
-                  </ng-container>
+                    <ng-container matColumnDef="active">
+                      <th mat-header-cell *matHeaderCellDef mat-sort-header>Czy aktywna</th>
+                      <td mat-cell *matCellDef="let row">
+                        <span *ngIf="row.groupActive === true; else noActiveGroup" class="status active-group">TAK</span>
+                        <ng-template #noActiveGroup><span class="status no-active-group">NIE</span></ng-template>
+                      </td>
+                    </ng-container>
 
-                  <tr mat-header-row *matHeaderRowDef="activitiesColumns"></tr>
-                  <tr mat-row *matRowDef="let row; columns: activitiesColumns;"></tr>
+                    <tr mat-header-row *matHeaderRowDef="activitiesColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: activitiesColumns;"></tr>
 
-                  <tr class="mat-row" *matNoDataRow>
-                    <td class="mat-cell" colspan="4">Brak danych do wyświetlenia</td>
-                  </tr>
-                </table>
+                    <tr class="mat-row" *matNoDataRow>
+                      <td class="mat-cell" colspan="4">Brak danych do wyświetlenia</td>
+                    </tr>
+                  </table>
+                </div>
 
                 <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" aria-label="Wybierz stronę" class="mb-3"></mat-paginator>
               </div>

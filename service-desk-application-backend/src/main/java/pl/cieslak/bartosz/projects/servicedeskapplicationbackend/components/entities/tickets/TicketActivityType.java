@@ -9,5 +9,7 @@ public enum TicketActivityType
     ASSIGN_GROUP,
     RESOLUTION,
     COMPLAINT,
-    CLOSE_TICKET
+    CLOSE_TICKET,
+    EDIT,
+    CHANGE_STATUS
 }

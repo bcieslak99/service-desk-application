@@ -1,3 +1,5 @@
+import {UserAsListElement} from "./user-data.interfaces";
+
 export interface GroupData
 {
   groupId: string,
@@ -52,4 +54,10 @@ export interface MemberToModify
   phoneNumber: string | null,
   userActive: boolean,
   modify: string
+}
+
+export interface Members
+{
+  manager: UserAsListElement | null;
+  members: UserAsListElement[]
 }

@@ -48,6 +48,18 @@ export enum TicketStatus
   CLOSED
 }
 
+export interface NewTicketStatus
+{
+  newTicketStatus: TicketStatus,
+  comment: string
+}
+
+export interface StatusAsListElement
+{
+  ticketStatus: TicketStatus,
+  polishVersion: string
+}
+
 export interface Ticket
 {
   id: string,
@@ -136,4 +148,10 @@ export interface PermissionsInformationAboutTicket
   accessAsEmployee: boolean,
   accessAsFirstLineAnalyst: boolean,
   accessAsSecondLineAnalyst: boolean
+}
+
+export interface DataToCommentDialogInitialisation
+{
+  title: string,
+  comment: string
 }

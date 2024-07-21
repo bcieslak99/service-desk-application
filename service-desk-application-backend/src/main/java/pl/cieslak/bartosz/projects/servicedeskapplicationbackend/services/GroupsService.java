@@ -17,6 +17,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.gr
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.user.UserRepository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -480,5 +481,44 @@ public class GroupsService
         {
             return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
         }
+    }
+
+    public ResponseEntity<?> getUserGroups(Principal principal)
+    {
+        try
+        {
+            if(principal == null) throw new UserNotFoundException("Nie rozpoznano twojego konta!");
+            Optional<User> userInDatabase = this.USER_REPOSITORY.getUserAndGroupsById(this.USER_SERVICE.extractUserId(principal));
+            if(userInDatabase.isEmpty()) throw new UserNotFoundException("Nie rozpoznano twojego konta!");
+            User user = userInDatabase.get();
+
+            List<SupportGroup> groups = user.getUserGroups();
+            ArrayList<GroupDetailsDTO> groupList = new ArrayList<>();
+            groupList.ensureCapacity(groups.size());
+
+            groups.forEach(group -> groupList.add(prepareGroupDetails(group)));
+
+            return ResponseEntity.ok(groupList);
+        }
+        catch(UserNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch (Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
+        }
+    }
+
+    public ResponseEntity<List<GroupDetailsDTO>> getActiveGroups()
+    {
+        List<SupportGroup> groupsInDatabase = this.GROUP_REPOSITORY.getActiveGroups();
+        ArrayList<GroupDetailsDTO> groups = new ArrayList<>();
+        groupsInDatabase.forEach(group -> {
+            GroupDetailsDTO details = group.prepareGroupDetails();
+            if(details != null) groups.add(details);
+        });
+
+        return ResponseEntity.ok(groups);
     }
 }

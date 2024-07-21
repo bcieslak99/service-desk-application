@@ -7,6 +7,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.CategoryDetailsForEmployeeDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.GroupType;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketCategory;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketStatus;
@@ -14,11 +15,13 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.enti
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryIsDisabledException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryNotFoundException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.groups.GroupNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.EndpointNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.PermissionDeniedException;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketNotFoundException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.tickets.TicketRepository;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.GroupsService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
 import java.security.Principal;
@@ -34,18 +37,24 @@ public class TicketService
     private final UserService USER_SERVICE;
     private final TicketCategoryService TICKET_CATEGORY_SERVICE;
     private final TicketActivityService TICKET_ACTIVITY_SERVICE;
+    private final GroupsService GROUP_SERVICE;
 
     private static final String USER_NOT_FOUND_MESSAGE = "Nie rozpoznano Twojego konta!";
-    private static final String CUSTOMER_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego zgłaszającego!";
-    private static final String REPORTER_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego użytkownika!";
+    private static final String CUSTOMER_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego użytkownika!";
+    private static final String REPORTER_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego zgłaszającego!";
     private static final String CATEGORY_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanej kategorii!";
     private static final String CATEGORY_IS_DISABLED_MESSAGE = "Ta kategoria jest dezaktywowana!";
     private static final String BAD_TICKET_STATUS_MESSAGE = "Wybrany status zgłoszenia nie istnieje!";
     private static final String BAD_TICKET_TYPE_MESSAGE = "Wybrany status zgłoszenia nie istnieje!";
     private static final String TICKET_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego zgłoszenia!";
     private static final String PERMISSION_DENIED_MESSAGE = "Nie masz dostępu do tego zasobu!";
+    private static final String TICKET_IS_CLOSED_MESSAGE = "Zgłoszenie jest zamknięte! Nie można go modyfikować!";
+    private static final String TICKET_ACTIVITY_ERROR_MESSAGE = "Nie udało sie dodać aktywności!";
+    private static final String TICKET_DESCRIPTION_MESSAGE = "Podano nieprawidłowy opis zgłoszenia!";
+    private static final String GROUP_NOT_FOUND_MESSAGE = "Wskazana grupa nie została odnaleziona!";
+    private static final String GROUP_IN_NOT_ACTIVE_MESSAGE = "Wskazana grupa jest nieaktywna!";
 
-    public TicketType extractTicketType(String ticketType)
+    public static TicketType extractTicketType(String ticketType)
     {
         if(ticketType == null) return null;
 
@@ -57,7 +66,7 @@ public class TicketService
         };
     }
 
-    public TicketStatus extractTicketStatus(String ticketStatus)
+    public static TicketStatus extractTicketStatus(String ticketStatus)
     {
         if(ticketStatus == null) return null;
 
@@ -68,6 +77,18 @@ public class TicketService
             case "resolved" -> TicketStatus.RESOLVED;
             case "closed" -> TicketStatus.CLOSED;
             default -> null;
+        };
+    }
+
+    public static String changeTicketStatusToPolish(TicketStatus ticketStatus)
+    {
+        return switch (ticketStatus)
+        {
+            case PENDING -> "Oczekujące";
+            case IN_PROGRESS -> "W trakcie";
+            case ON_HOLD -> "Wstrzymane";
+            case RESOLVED -> "Rozwiązane";
+            case CLOSED -> "Zamknięte";
         };
     }
 
@@ -259,13 +280,311 @@ public class TicketService
         else throw new PermissionDeniedException(PERMISSION_DENIED_MESSAGE);
     }
 
+    public PermissionsToTicket getInformationAboutPermissions(UUID whoWants, UUID ticketId) throws TicketNotFoundException, UserNotFoundException
+    {
+        PermissionsToTicket permissions = new PermissionsToTicket();
+        permissions.setAccessAsEmployee(userHasAccessAsEmployeeToTicket(whoWants, ticketId));
+        permissions.setAccessAsFirstLineAnalyst(userHasAccessAsFirstLineAnalyst(whoWants));
+        permissions.setAccessAsSecondLineAnalyst(userHasAccessAsSecondLineAnalyst(whoWants, ticketId));
+        return permissions;
+    }
+
     public PermissionsToTicket getInformationAboutPermissions(Principal whoWants, UUID ticketId) throws TicketNotFoundException, UserNotFoundException
     {
         UUID userId = this.USER_SERVICE.extractUserId(whoWants);
-        PermissionsToTicket permissions = new PermissionsToTicket();
-        permissions.setAccessAsEmployee(userHasAccessAsEmployeeToTicket(userId, ticketId));
-        permissions.setAccessAsFirstLineAnalyst(userHasAccessAsFirstLineAnalyst(userId));
-        permissions.setAccessAsSecondLineAnalyst(userHasAccessAsSecondLineAnalyst(userId, ticketId));
-        return permissions;
+        return getInformationAboutPermissions(userId, ticketId);
+    }
+
+    @Transactional
+    public void changeUser(Principal whoWants, UUID ticketId, UUID newUserId) throws Exception
+    {
+        if(whoWants == null) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        if(ticketId == null) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        if(newUserId == null) throw new UserNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE);
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        if(ticket.getStatus().equals(TicketStatus.CLOSED))
+            throw new TicketIsClosedException(TICKET_IS_CLOSED_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(newUserId);
+        if(userInDatabase.isEmpty()) throw new UserNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE);
+        User newUser = userInDatabase.get();
+
+        PermissionsToTicket permissions = getInformationAboutPermissions(whoWants, ticketId);
+        if(!permissions.isAccessAsFirstLineAnalyst() && !permissions.isAccessAsSecondLineAnalyst() && !permissions.isAccessAsEmployee())
+            throw new PermissionDeniedException(PERMISSION_DENIED_MESSAGE);
+
+        Optional<User> analystInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(whoWants));
+        if(analystInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User analyst = analystInDatabase.get();
+
+        User lastUser = ticket.getCustomer();
+        ticket.setCustomer(newUser);
+
+        this.TICKET_REPOSITORY.saveAndFlush(ticket);
+        this.TICKET_ACTIVITY_SERVICE.addUserChangeActivity(ticket, analyst, lastUser, newUser);
+    }
+
+    @Transactional
+    public void changeReporter(Principal whoWants, UUID ticketId, UUID newReporterId) throws Exception
+    {
+        if(whoWants == null) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        if(ticketId == null) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        if(newReporterId == null) throw new UserNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE);
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        if(ticket.getStatus().equals(TicketStatus.CLOSED))
+            throw new TicketIsClosedException(TICKET_IS_CLOSED_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(newReporterId);
+        if(userInDatabase.isEmpty()) throw new UserNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE);
+        User newReporter = userInDatabase.get();
+
+        PermissionsToTicket permissions = getInformationAboutPermissions(whoWants, ticketId);
+        if(!permissions.isAccessAsFirstLineAnalyst() && !permissions.isAccessAsSecondLineAnalyst())
+            throw new PermissionDeniedException(PERMISSION_DENIED_MESSAGE);
+
+        Optional<User> analystInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(whoWants));
+        if(analystInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User analyst = analystInDatabase.get();
+
+        User lastReporter = ticket.getCustomer();
+        ticket.setReporter(newReporter);
+
+        this.TICKET_REPOSITORY.saveAndFlush(ticket);
+        this.TICKET_ACTIVITY_SERVICE.addReporterChangeActivity(ticket, analyst, lastReporter, newReporter);
+    }
+
+    @Transactional
+    public void changeStatus(Principal whoWants, UUID ticketId, ChangeTicketStatusDTO newStatus) throws Exception
+    {
+        if(ticketId == null) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        if(newStatus == null) throw new TicketStatusException(BAD_TICKET_STATUS_MESSAGE);
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        if(ticket.getStatus().equals(TicketStatus.CLOSED))
+            throw new TicketIsClosedException(TICKET_IS_CLOSED_MESSAGE);
+
+        PermissionsToTicket permissions = getInformationAboutPermissions(whoWants, ticketId);
+        if(!permissions.isAccessAsFirstLineAnalyst() && !permissions.isAccessAsSecondLineAnalyst())
+            throw new PermissionDeniedException(PERMISSION_DENIED_MESSAGE);
+
+        Optional<User> analystInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(whoWants));
+        if(analystInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User analyst = analystInDatabase.get();
+
+        if(ticket.getAssigneeAnalyst() == null && !newStatus.getNewTicketStatus().equals(TicketStatus.PENDING))
+            ticket.setAssigneeAnalyst(analyst);
+        else if(ticket.getAssigneeAnalyst() != null && newStatus.getNewTicketStatus().equals(TicketStatus.PENDING))
+            ticket.setAssigneeAnalyst(null);
+
+        if(newStatus.getNewTicketStatus().equals(TicketStatus.RESOLVED))
+            ticket.setResolveDate(LocalDateTime.now());
+
+        if(!newStatus.getNewTicketStatus().equals(TicketStatus.RESOLVED) && !newStatus.getNewTicketStatus().equals(TicketStatus.CLOSED))
+            ticket.setResolveDate(null);
+
+        TicketStatus lastStatus = ticket.getStatus();
+        ticket.setStatus(newStatus.getNewTicketStatus());
+
+        this.TICKET_REPOSITORY.saveAndFlush(ticket);
+        this.TICKET_ACTIVITY_SERVICE.addStatusChangeActivity(ticket, analyst, lastStatus, newStatus);
+    }
+
+    @Transactional
+    public void addComment(Principal who, UUID ticketId, String comment) throws Exception
+    {
+        if(who == null || who.getName() == null || who.getName().trim().isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        if(ticketId == null) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        if(comment == null || comment.trim().isEmpty()) throw new TicketActivityException(TICKET_ACTIVITY_ERROR_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(who));
+        if(userInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User user = userInDatabase.get();
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        this.TICKET_ACTIVITY_SERVICE.addComment(ticket, user, comment);
+    }
+
+    @Transactional
+    public void addReminder(Principal who, UUID ticketId, String comment) throws Exception
+    {
+        if(who == null || who.getName() == null || who.getName().trim().isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        if(ticketId == null) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        if(comment == null || comment.trim().isEmpty()) throw new TicketActivityException(TICKET_ACTIVITY_ERROR_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(who));
+        if(userInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User user = userInDatabase.get();
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        PermissionsToTicket permissions = getInformationAboutPermissions(who, ticketId);
+        if(!(permissions.isAccessAsEmployee() || permissions.isAccessAsFirstLineAnalyst()))
+            throw new PermissionDeniedException(PERMISSION_DENIED_MESSAGE);
+
+        this.TICKET_ACTIVITY_SERVICE.addReminder(ticket, user, comment);
+    }
+
+    @Transactional
+    public void addInternalNote(Principal who, UUID ticketId, String comment) throws Exception
+    {
+        if(who == null || who.getName() == null || who.getName().trim().isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        if(ticketId == null) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        if(comment == null || comment.trim().isEmpty()) throw new TicketActivityException(TICKET_ACTIVITY_ERROR_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(who));
+        if(userInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User user = userInDatabase.get();
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        this.TICKET_ACTIVITY_SERVICE.addInternalNote(ticket, user, comment);
+    }
+
+    @Transactional
+    public void changeTicketCategory(Principal who, UUID ticketId, UUID categoryId) throws Exception
+    {
+        if(who == null || who.getName() == null || who.getName().trim().isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        if(ticketId == null) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        if(categoryId == null) throw new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(who));
+        if(userInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User user = userInDatabase.get();
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        Optional<TicketCategory> categoryInDatabase = this.TICKET_CATEGORY_SERVICE.getCategoryById(categoryId);
+        if(categoryInDatabase.isEmpty()) throw new CategoryNotFoundException(CATEGORY_NOT_FOUND_MESSAGE);
+        TicketCategory category = categoryInDatabase.get();
+        if(!category.isCategoryIsActive()) throw new CategoryIsDisabledException(CATEGORY_IS_DISABLED_MESSAGE);
+
+        PermissionsToTicket permissions = getInformationAboutPermissions(user.getId(), ticketId);
+        if(!(permissions.isAccessAsFirstLineAnalyst() || permissions.isAccessAsSecondLineAnalyst()))
+            throw new PermissionDeniedException(PERMISSION_DENIED_MESSAGE);
+
+
+        TicketCategory oldCategory = ticket.getCategory();
+        ticket.setCategory(category);
+
+        this.TICKET_REPOSITORY.saveAndFlush(ticket);
+        this.TICKET_ACTIVITY_SERVICE.addChangeCategoryActivity(ticket, user, oldCategory, category);
+    }
+
+    @Transactional
+    public void changeTicketDescription(Principal who, UUID ticketId, String description) throws Exception
+    {
+        if(who == null || who.getName() == null || who.getName().trim().isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        if(ticketId == null) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        if(description == null || description.trim().isEmpty()) throw new TicketDescriptionException(TICKET_DESCRIPTION_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(who));
+        if(userInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User user = userInDatabase.get();
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        String oldDescription = ticket.getDescription();
+        ticket.setDescription(description);
+
+        this.TICKET_REPOSITORY.saveAndFlush(ticket);
+        this.TICKET_ACTIVITY_SERVICE.addChangeDescriptionActivity(ticket, user, oldDescription, description);
+    }
+
+    @Transactional
+    public void changeAssigneePerson(UUID ticketId, Principal who, UUID userId) throws Exception
+    {
+        if(who == null || who.getName() == null || who.getName().trim().isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        if(ticketId == null) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        if(userId == null) throw new UserNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(who));
+        if(userInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User user = userInDatabase.get();
+
+        Optional<User> analystInDatabase = this.USER_SERVICE.getUserById(userId);
+        if(analystInDatabase.isEmpty()) throw new UserNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE);
+        User analyst = analystInDatabase.get();
+
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        if(ticket.getStatus().equals(TicketStatus.CLOSED))
+            throw new TicketIsClosedException(TICKET_IS_CLOSED_MESSAGE);
+
+        Optional<SupportGroup> groupInDatabase = this.GROUP_SERVICE.getGroupAndMembersById(ticket.getAssigneeGroup().getId());
+        if(groupInDatabase.isEmpty()) throw new Exception("Błąd - nieprzypisana grupa do zgłoszenia!");
+        SupportGroup group = groupInDatabase.get();
+
+        List<User> members = group.getGroupMembers();
+        if(members.stream().noneMatch(member -> member.getId().equals(user.getId())))
+            throw new UserNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE);
+
+        User oldUser = ticket.getAssigneeAnalyst();
+
+        ticket.setAssigneeAnalyst(analyst);
+        this.TICKET_REPOSITORY.saveAndFlush(ticket);
+        this.TICKET_ACTIVITY_SERVICE.addChangeAnalystActivity(ticket, user, oldUser, analyst);
+    }
+
+    @Transactional
+    public void changeAssigneeGroup(UUID ticketId, Principal who, UUID groupId) throws Exception
+    {
+        Optional<Ticket> ticketInDatabase = this.TICKET_REPOSITORY.getTicketDetailsById(ticketId);
+        if(ticketInDatabase.isEmpty()) throw new TicketNotFoundException(TICKET_NOT_FOUND_MESSAGE);
+        Ticket ticket = ticketInDatabase.get();
+
+        if(ticket.getStatus().equals(TicketStatus.CLOSED))
+            throw new TicketIsClosedException(TICKET_IS_CLOSED_MESSAGE);
+
+        Optional<User> userInDatabase = this.USER_SERVICE.getUserById(this.USER_SERVICE.extractUserId(who));
+        if(userInDatabase.isEmpty()) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+        User user = userInDatabase.get();
+
+        Optional<SupportGroup> groupInDatabase = this.GROUP_SERVICE.getGroupById(groupId);
+        if(groupInDatabase.isEmpty()) throw new GroupNotFoundException(GROUP_NOT_FOUND_MESSAGE);
+        SupportGroup group = groupInDatabase.get();
+        if(!group.isGroupActive()) throw new GroupNotFoundException(GROUP_IN_NOT_ACTIVE_MESSAGE);
+
+        SupportGroup oldGroup = ticket.getAssigneeGroup();
+
+        ticket.setAssigneeGroup(group);
+        ticket.setAssigneeAnalyst(null);
+        this.TICKET_REPOSITORY.saveAndFlush(ticket);
+        this.TICKET_ACTIVITY_SERVICE.addChangeGroupActivity(ticket, user, oldGroup, group);
     }
 }
