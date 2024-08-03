@@ -1,0 +1,79 @@
+html, body
+{
+  height: 100%;
+  margin: 0;
+}
+
+.container-panel
+{
+  height: calc(100vh - 65px);
+}
+
+.row-panel
+{
+  height: 100%;
+}
+
+.panel
+{
+  height: 100%;
+  overflow-y: auto;
+}
+
+.tree-invisible
+{
+  display: none;
+}
+
+.tree ul,
+.tree li
+{
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+}
+
+.tree .mat-nested-tree-node div[role=group]
+{
+  padding-left: 40px;
+}
+
+.tree div[role=group] > .mat-tree-node
+{
+  padding-left: 40px;
+}
+
+mat-tree,
+.menu
+{
+  background-color: #e1e1e1;
+}
+
+.panel-title
+{
+  font-size: 30px;
+}
+
+.search-input
+{
+  width: 100%;
+}
+
+.equal-height-row
+{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Automatyczne dopasowanie kolumn */
+  gap: 1rem; /* Odstęp między kartami */
+}
+
+.equal-height-card mat-card
+{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.equal-height-card mat-card-content
+{
+  flex-grow: 1;
+}
