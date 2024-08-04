@@ -2,8 +2,9 @@ import { Component } from '@angular/core';
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {AuthService} from "../../../../services/auth.service";
-import {Ticket} from "../../../../models/ticket.interfaces";
 import {TicketHttpService} from "../../../shared/services/ticket-http.service";
+import {NotifierService} from "angular-notifier";
+import {Router} from "@angular/router";
 
 interface TreeNode {
   name: string;
@@ -176,7 +177,12 @@ export class AnalystPanelComponent
     }
   ];
 
-  constructor(private auth: AuthService, private httpTicketService: TicketHttpService)
+  constructor(
+    private auth: AuthService,
+    private httpTicketService: TicketHttpService,
+    private notifier: NotifierService,
+    private router: Router
+  )
   {
     this.dataSource.data = this.treeData;
   }
@@ -186,5 +192,24 @@ export class AnalystPanelComponent
   getTicketsOfGroups(ticketType: string, ticketStatus: string)
   {
     return this.httpTicketService.getTicketsOfGroups(ticketType, ticketStatus);
+  }
+
+  getTicketsOfUser(ticketType: string, ticketStatus: string)
+  {
+    return this.httpTicketService.getTicketsOfUser(ticketType, ticketStatus);
+  }
+
+  findTicket(): void
+  {
+    if(this.ticketId.trim().length < 1) return;
+
+    this.httpTicketService.ticketExists(this.ticketId).subscribe({
+      next: result =>  {
+        if(result.ticketExists) this.router.navigate(["/ticket", this.ticketId]);
+      },
+      error: err => {
+        this.notifier.notify("error", "Nie udało się pobrać informacji na temat zgłoszenia!");
+      }
+    })
   }
 }

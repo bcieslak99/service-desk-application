@@ -28,6 +28,8 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.ticket
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -373,13 +375,65 @@ public class TicketController
 
     @GetMapping("/assignee/group/list")
     @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
-    ResponseEntity<?> getPendingTicketsOfMyGroup(Principal principal, @PathParam("ticketStatus") TicketStatus ticketStatus, @PathParam("ticketType") TicketType ticketType)
+    public ResponseEntity<?> getTicketsOfMyGroupByStatusAndType(Principal principal, @PathParam("ticketStatus") TicketStatus ticketStatus, @PathParam("ticketType") TicketType ticketType)
     {
         try
         {
-            return ResponseEntity.ok(this.TICKET_SERVICE.getTicketsOfMyGroupByStatus(ticketStatus, ticketType, principal));
+            return ResponseEntity.ok(this.TICKET_SERVICE.getTicketsOfMyGroupByStatusAndType(ticketStatus, ticketType, principal));
         }
         catch(UserNotFoundException | TicketStatusException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @GetMapping("/assignee/analyst/list")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<?> getMyTicketsByStatusAndType(Principal principal, @PathParam("ticketType") TicketType ticketType, @PathParam("ticketStatus") TicketStatus ticketStatus)
+    {
+        try
+        {
+            return ResponseEntity.ok(this.TICKET_SERVICE.getUserTicketsByStatusAndType(ticketStatus, ticketType, principal));
+        }
+        catch(UserNotFoundException | TicketStatusException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @GetMapping("/exists/{ticketId}")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<Map<String, Boolean>> ticketExists(@PathVariable("ticketId") UUID ticketId)
+    {
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("ticketExists", this.TICKET_SERVICE.ticketExists(ticketId));
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/analyst/create")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<?> createTicketAsAnalyst(Principal principal, @Valid @RequestBody AnalystTicketFormDTO ticket, BindingResult errors)
+    {
+        if(principal.getName() == null || errors.hasErrors())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Wskazane dane zawierają błędy!", ResponseCode.ERROR));
+
+        try
+        {
+            UUID userId = USER_SERVICE.extractUserId(principal);
+            if(userId == null)
+                throw new UserNotFoundException("Nie odnaleziono Twoich danych!");
+
+            return ResponseEntity.ok(this.TICKET_SERVICE.createTicket(userId, ticket).prepareDetailsForEmployee());
+        }
+        catch(UserNotFoundException | CategoryNotFoundException | CategoryIsDisabledException exception)
         {
             return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
         }

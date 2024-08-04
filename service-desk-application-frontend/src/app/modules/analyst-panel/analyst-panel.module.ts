@@ -7,31 +7,40 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {MatInputModule} from "@angular/material/input";
 import {MatCardModule} from "@angular/material/card";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { TicketListComponent } from './components/ticket-list/ticket-list.component';
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatSortModule} from "@angular/material/sort";
 import {MatTableModule} from "@angular/material/table";
+import { RegisterTicketComponent } from './components/register/register-ticket/register-ticket.component';
+import { RegisterIncidentComponent } from './components/register/register-incident/register-incident.component';
+import { RegisterServiceRequestComponent } from './components/register/register-service-request/register-service-request.component';
+import {SharedModule} from "../shared/shared.module";
 
 
 
 @NgModule({
   declarations: [
     AnalystPanelComponent,
-    TicketListComponent
+    TicketListComponent,
+    RegisterTicketComponent,
+    RegisterIncidentComponent,
+    RegisterServiceRequestComponent
   ],
-    imports: [
-        CommonModule,
-        AnalystPanelRoutingModule,
-        MatTreeModule,
-        MatIconModule,
-        MatButtonModule,
-        MatInputModule,
-        MatCardModule,
-        FormsModule,
-        MatPaginatorModule,
-        MatSortModule,
-        MatTableModule
-    ]
+  imports: [
+    CommonModule,
+    AnalystPanelRoutingModule,
+    MatTreeModule,
+    MatIconModule,
+    MatButtonModule,
+    MatInputModule,
+    MatCardModule,
+    FormsModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatTableModule,
+    ReactiveFormsModule,
+    SharedModule
+  ]
 })
 export class AnalystPanelModule {}

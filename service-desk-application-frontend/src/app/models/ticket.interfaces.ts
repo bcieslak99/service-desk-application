@@ -32,6 +32,14 @@ export interface EmployeeTicketForm
   description: string
 }
 
+export interface AnalystTicketForm
+{
+  customer: string,
+  reporter: string,
+  category: string,
+  description: string
+}
+
 export enum TicketType
 {
   SERVICE_REQUEST,

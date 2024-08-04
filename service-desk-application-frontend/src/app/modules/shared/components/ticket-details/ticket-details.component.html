@@ -42,7 +42,7 @@
             <mat-icon>arrow_back</mat-icon>
             Powrót do panelu pracownika
           </a>
-          <a class="mb-3" color="accent" mat-raised-button routerLink="/analyst/panel">
+          <a *ngIf="userIsAnalyst()" class="mb-3" color="accent" mat-raised-button routerLink="/analyst/panel">
             <mat-icon>arrow_back</mat-icon>
             Powrót do panelu analityka
           </a>

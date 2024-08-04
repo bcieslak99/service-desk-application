@@ -2,8 +2,10 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {ApplicationSettings} from "../../../application-settings";
 import {
+  AnalystTicketForm,
+  EmployeeTicketForm,
   NewTicketStatus,
-  PermissionsInformationAboutTicket, TicketCategory,
+  PermissionsInformationAboutTicket, Ticket, TicketCategory,
   TicketDetailsForAnalyst,
   TicketDetailsForEmployee,
   TicketStatus
@@ -11,6 +13,7 @@ import {
 import {Observable} from "rxjs";
 import {ServerResponsesMessage} from "../../../models/server-responses.interfaces";
 import {GroupData, Members} from "../../../models/group-data.interfaces";
+import {UserAsListElement} from "../../../models/user-data.interfaces";
 
 @Injectable({
   providedIn: 'root'
@@ -111,5 +114,25 @@ export class TicketHttpService
   getTicketsOfGroups(ticketType: string, ticketStatus: string)
   {
     return this.http.get<TicketDetailsForAnalyst[]>(ApplicationSettings.apiUrl + "/api/v1/ticket/assignee/group/list?ticketType=" + ticketType + "&ticketStatus=" + ticketStatus);
+  }
+
+  getTicketsOfUser(ticketType: string, ticketStatus: string)
+  {
+    return this.http.get<TicketDetailsForAnalyst[]>(ApplicationSettings.apiUrl + "/api/v1/ticket/assignee/analyst/list?ticketType=" + ticketType + "&ticketStatus=" + ticketStatus);
+  }
+
+  ticketExists(ticketId: string)
+  {
+    return this.http.get<{ticketExists: boolean}>(ApplicationSettings.apiUrl + "/api/v1/ticket/exists/" + ticketId);
+  }
+
+  getActiveUsers(): Observable<UserAsListElement[]>
+  {
+    return this.http.get<UserAsListElement[]>(ApplicationSettings.apiUrl + "/api/v1/user/list/active");
+  }
+
+  registerTicketAsAnalyst(ticketData: AnalystTicketForm): Observable<Ticket>
+  {
+    return this.http.post<Ticket>(ApplicationSettings.apiUrl + "/api/v1/ticket/analyst/create", ticketData);
   }
 }

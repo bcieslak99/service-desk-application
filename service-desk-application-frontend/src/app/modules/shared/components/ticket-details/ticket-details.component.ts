@@ -53,6 +53,11 @@ export class TicketDetailsComponent implements AfterViewInit, OnDestroy
       private dialog: MatDialog
     ) {}
 
+    userIsAnalyst(): boolean
+    {
+      return this.auth.userIsFirstLineAnalyst() || this.userIsSecondLineAnalyst();
+    }
+
     private loadTicketDetails(): void
     {
         this.subForDetails = this.route.paramMap.pipe(switchMap((params: ParamMap) => {

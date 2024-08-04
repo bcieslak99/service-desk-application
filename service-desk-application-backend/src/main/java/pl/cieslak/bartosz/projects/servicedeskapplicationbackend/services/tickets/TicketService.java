@@ -138,6 +138,8 @@ public class TicketService
         if(userInDataBase.isEmpty())
             throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
 
+        User user = userInDataBase.get();
+
         Optional<User> reporterInDatabase = this.USER_SERVICE.getUserById(ticketData.getReporter());
         if(reporterInDatabase.isEmpty())
             throw new UserNotFoundException(REPORTER_NOT_FOUND_MESSAGE);
@@ -161,7 +163,7 @@ public class TicketService
 
         ticket = this.TICKET_REPOSITORY.saveAndFlush(ticket);
 
-        this.TICKET_ACTIVITY_SERVICE.addCreationActivity(ticket, reporter);
+        this.TICKET_ACTIVITY_SERVICE.addCreationActivity(ticket, user);
 
         return ticket;
     }
@@ -557,6 +559,13 @@ public class TicketService
         User oldUser = ticket.getAssigneeAnalyst();
 
         ticket.setAssigneeAnalyst(analyst);
+        if(ticket.getStatus().equals(TicketStatus.PENDING))
+        {
+            TicketStatus oldStatus = ticket.getStatus();
+            ticket.setStatus(TicketStatus.IN_PROGRESS);
+            this.TICKET_REPOSITORY.saveAndFlush(ticket);
+            this.TICKET_ACTIVITY_SERVICE.addStatusChangeActivity(ticket, user, oldStatus, new ChangeTicketStatusDTO(TicketStatus.IN_PROGRESS, "Rozpoczęcie realizacji"));
+        }
         this.TICKET_REPOSITORY.saveAndFlush(ticket);
         this.TICKET_ACTIVITY_SERVICE.addChangeAnalystActivity(ticket, user, oldUser, analyst);
     }
@@ -588,7 +597,7 @@ public class TicketService
         this.TICKET_ACTIVITY_SERVICE.addChangeGroupActivity(ticket, user, oldGroup, group);
     }
 
-    public List<TicketDetailsForAnalystDTO> getTicketsOfMyGroupByStatus(TicketStatus ticketStatus, TicketType ticketType, Principal principal) throws Exception
+    public List<TicketDetailsForAnalystDTO> getTicketsOfMyGroupByStatusAndType(TicketStatus ticketStatus, TicketType ticketType, Principal principal) throws Exception
     {
         if(ticketStatus == null) throw new TicketStatusException(BAD_TICKET_STATUS_MESSAGE);
         if(ticketType == null) throw new TicketStatusException(BAD_TICKET_TYPE_MESSAGE);
@@ -609,5 +618,34 @@ public class TicketService
         });
 
         return tickets;
+    }
+
+    public List<TicketDetailsForAnalystDTO> getUserTicketsByStatusAndType(TicketStatus ticketStatus, TicketType ticketType, Principal principal) throws Exception
+    {
+        if(ticketStatus == null) throw new TicketStatusException(BAD_TICKET_STATUS_MESSAGE);
+        if(ticketType == null) throw new TicketStatusException(BAD_TICKET_TYPE_MESSAGE);
+        if(principal == null || principal.getName() == null || principal.getName().trim().isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        UUID userId = this.USER_SERVICE.extractUserId(principal);
+        if(userId == null) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        List<Ticket> ticketsInDatabase = this.TICKET_REPOSITORY.getUserTicketsByStatusAndType(ticketStatus, ticketType, userId);
+
+        ArrayList<TicketDetailsForAnalystDTO> tickets = new ArrayList<>();
+        if(ticketsInDatabase.size() > 0) tickets.ensureCapacity(ticketsInDatabase.size());
+
+        ticketsInDatabase.forEach(ticket -> {
+            TicketDetailsForAnalystDTO details = ticket.prepareDetailsForAnalyst();
+            if(details != null) tickets.add(details);
+        });
+
+        return tickets;
+    }
+
+    public boolean ticketExists(UUID ticketId)
+    {
+        if(ticketId == null) return false;
+        return this.TICKET_REPOSITORY.getTicketDetailsById(ticketId).isPresent();
     }
 }

@@ -62,8 +62,8 @@
             <mat-card-content class="mt-3">
               <p>W tym miejscu możesz zarejestrować zgłoszenie dla siebie lub innego użytkownika.</p>
               <div class="mt-3">
-                <a class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>bug_report</mat-icon> Zarejestruj incydent</a>
-                <a class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>support_agent</mat-icon> Zarejestruj wniosek o usługę</a>
+                <a routerLink="/analyst/ticket/incident/create" class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>bug_report</mat-icon> Zarejestruj incydent</a>
+                <a routerLink="/analyst/ticket/service/create" class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>support_agent</mat-icon> Zarejestruj wniosek o usługę</a>
               </div>
             </mat-card-content>
           </mat-card>
@@ -96,11 +96,35 @@
                 <mat-label>Identyfikator zgłoszenia</mat-label>
                 <input placeholder="Podaj identyfikator zgłoszenia" matInput type="text" [(ngModel)]="ticketId">
               </mat-form-field>
-              <button [disabled]="ticketId.trim().length < 1" mat-raised-button><mat-icon>search</mat-icon> Wyszukaj zgłoszenie</button>
+              <button (click)="findTicket()" [disabled]="ticketId.trim().length < 1" mat-raised-button><mat-icon>search</mat-icon> Wyszukaj zgłoszenie</button>
             </mat-card-content>
           </mat-card>
         </div>
 
+      </div>
+
+      <div *ngSwitchCase="MY_INCIDENT_IN_PROGRESS" class="mt-3">
+        <app-ticket-list [title]="'Incydenty w trakcie realizacji'" [ticketsRequest]="getTicketsOfUser('INCIDENT', 'IN_PROGRESS')"></app-ticket-list>
+      </div>
+
+      <div *ngSwitchCase="MY_INCIDENT_ON_HOLD" class="mt-3">
+        <app-ticket-list [title]="'Incydenty wstrzymane'" [ticketsRequest]="getTicketsOfUser('INCIDENT', 'ON_HOLD')"></app-ticket-list>
+      </div>
+
+      <div *ngSwitchCase="MY_INCIDENT_RESOLVED" class="mt-3">
+        <app-ticket-list [title]="'Incydenty rozwiązane'" [ticketsRequest]="getTicketsOfUser('INCIDENT', 'RESOLVED')"></app-ticket-list>
+      </div>
+
+      <div *ngSwitchCase="MY_SERVICE_REQUEST_IN_PROGRESS" class="mt-3">
+        <app-ticket-list [title]="'Wnioski o usługę w trakcie realizacji'" [ticketsRequest]="getTicketsOfUser('SERVICE_REQUEST', 'IN_PROGRESS')"></app-ticket-list>
+      </div>
+
+      <div *ngSwitchCase="MY_SERVICE_REQUEST_ON_HOLD" class="mt-3">
+        <app-ticket-list [title]="'Wnioski o usługę wstrzymane'" [ticketsRequest]="getTicketsOfUser('SERVICE_REQUEST', 'ON_HOLD')"></app-ticket-list>
+      </div>
+
+      <div *ngSwitchCase="MY_SERVICE_REQUEST_RESOLVED" class="mt-3">
+        <app-ticket-list [title]="'Wnioski o usługę rozwiązane'" [ticketsRequest]="getTicketsOfUser('SERVICE_REQUEST', 'RESOLVED')"></app-ticket-list>
       </div>
 
       <div *ngSwitchCase="GROUP_INCIDENT_PENDING" class="mt-3">

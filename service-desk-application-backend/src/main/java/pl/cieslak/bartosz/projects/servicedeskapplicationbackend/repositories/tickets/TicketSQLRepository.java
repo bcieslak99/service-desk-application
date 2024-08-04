@@ -40,9 +40,20 @@ interface TicketSQLRepository extends JpaRepository<Ticket, UUID>, TicketReposit
             "from Ticket as t " +
             "left join fetch t.assigneeGroup as ag " +
             "left join fetch ag.groupMembers as gm " +
+            "left join fetch t.assigneeAnalyst as aa" +
             "left join fetch t.customer as c " +
             "left join fetch t.reporter as r " +
             "left join fetch t.category as ca " +
             "where gm.id = :userId and t.status = :ticketStatus and t.ticketType = :ticketType")
     List<Ticket> getTicketOfMyGroupsByStatusAndTicketType(@Param("ticketStatus") TicketStatus ticketStatus, @Param("ticketType") TicketType ticketType, @Param("userId") UUID userId);
+
+    @Query("select t " +
+            "from Ticket as t " +
+            "left join fetch t.assigneeGroup ag " +
+            "left join fetch t.assigneeAnalyst as aa " +
+            "left join fetch  t.customer as c " +
+            "left join fetch t.reporter as r " +
+            "left join fetch t.category as ca " +
+            "where aa.id = :userId and t.ticketType = :ticketType and t.status = :ticketStatus")
+    List<Ticket> getUserTicketsByStatusAndType(@Param("ticketStatus") TicketStatus ticketStatus, @Param("ticketType") TicketType ticketType, @Param("userId") UUID userId);
 }
