@@ -587,4 +587,27 @@ public class TicketService
         this.TICKET_REPOSITORY.saveAndFlush(ticket);
         this.TICKET_ACTIVITY_SERVICE.addChangeGroupActivity(ticket, user, oldGroup, group);
     }
+
+    public List<TicketDetailsForAnalystDTO> getTicketsOfMyGroupByStatus(TicketStatus ticketStatus, TicketType ticketType, Principal principal) throws Exception
+    {
+        if(ticketStatus == null) throw new TicketStatusException(BAD_TICKET_STATUS_MESSAGE);
+        if(ticketType == null) throw new TicketStatusException(BAD_TICKET_TYPE_MESSAGE);
+        if(principal == null || principal.getName() == null || principal.getName().trim().isEmpty())
+            throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        UUID userId = this.USER_SERVICE.extractUserId(principal);
+        if(userId == null) throw new UserNotFoundException(USER_NOT_FOUND_MESSAGE);
+
+        List<Ticket> ticketsInDatabase = this.TICKET_REPOSITORY.getTicketOfMyGroupsByStatusAndTicketType(ticketStatus, ticketType, userId);
+
+        ArrayList<TicketDetailsForAnalystDTO> tickets = new ArrayList<>();
+        if(ticketsInDatabase.size() > 0) tickets.ensureCapacity(ticketsInDatabase.size());
+
+        ticketsInDatabase.forEach(ticket -> {
+            TicketDetailsForAnalystDTO details = ticket.prepareDetailsForAnalyst();
+            if(details != null) tickets.add(details);
+        });
+
+        return tickets;
+    }
 }

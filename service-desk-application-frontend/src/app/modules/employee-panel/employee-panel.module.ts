@@ -20,13 +20,16 @@ import {MatSortModule} from "@angular/material/sort";
 import {MatTableModule} from "@angular/material/table";
 
 @NgModule({
-  declarations: [
-    EmployeePanelComponent,
-    CreateTicketPanelComponent,
-    IncidentCreatePanelComponent,
-    ServiceCreatePanelComponent,
-    TicketListComponent
-  ],
+    declarations: [
+        EmployeePanelComponent,
+        CreateTicketPanelComponent,
+        IncidentCreatePanelComponent,
+        ServiceCreatePanelComponent,
+        TicketListComponent
+    ],
+    exports: [
+        TicketListComponent
+    ],
     imports: [
         CommonModule,
         EmployeePanelRoutingModule,

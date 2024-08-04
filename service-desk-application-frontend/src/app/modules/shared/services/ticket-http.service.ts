@@ -107,4 +107,9 @@ export class TicketHttpService
   {
     return this.http.patch<ServerResponsesMessage>(ApplicationSettings.apiUrl + "/api/v1/ticket/assignee/group/change/" + ticketId, {groupId: groupId});
   }
+
+  getTicketsOfGroups(ticketType: string, ticketStatus: string)
+  {
+    return this.http.get<TicketDetailsForAnalyst[]>(ApplicationSettings.apiUrl + "/api/v1/ticket/assignee/group/list?ticketType=" + ticketType + "&ticketStatus=" + ticketStatus);
+  }
 }

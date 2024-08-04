@@ -1,6 +1,7 @@
 package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.controllers.api.v1;
 
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,20 +13,16 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupIdDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.AnalystTicketFormDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.EmployeeTicketFormDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.ChangeTicketStatusDTO;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.TicketDescriptionDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.ticket.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.UserId;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketStatus;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketType;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryIsDisabledException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.categories.CategoryNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.groups.GroupNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.EndpointNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.PermissionDeniedException;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketActivityException;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketDescriptionException;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketIsClosedException;
-import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.TicketNotFoundException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
@@ -365,6 +362,24 @@ public class TicketController
             return ResponseEntity.ok(new ResponseMessage("Zgłoszenie zostało przekazane.", ResponseCode.SUCCESS));
         }
         catch(TicketNotFoundException | TicketIsClosedException | TicketActivityException | UserNotFoundException | GroupNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @GetMapping("/assignee/group/list")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    ResponseEntity<?> getPendingTicketsOfMyGroup(Principal principal, @PathParam("ticketStatus") TicketStatus ticketStatus, @PathParam("ticketType") TicketType ticketType)
+    {
+        try
+        {
+            return ResponseEntity.ok(this.TICKET_SERVICE.getTicketsOfMyGroupByStatus(ticketStatus, ticketType, principal));
+        }
+        catch(UserNotFoundException | TicketStatusException exception)
         {
             return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
         }

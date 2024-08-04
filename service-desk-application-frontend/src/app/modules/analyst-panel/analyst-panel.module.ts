@@ -8,22 +8,30 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatInputModule} from "@angular/material/input";
 import {MatCardModule} from "@angular/material/card";
 import {FormsModule} from "@angular/forms";
+import { TicketListComponent } from './components/ticket-list/ticket-list.component';
+import {MatPaginatorModule} from "@angular/material/paginator";
+import {MatSortModule} from "@angular/material/sort";
+import {MatTableModule} from "@angular/material/table";
 
 
 
 @NgModule({
   declarations: [
-    AnalystPanelComponent
+    AnalystPanelComponent,
+    TicketListComponent
   ],
-  imports: [
-    CommonModule,
-    AnalystPanelRoutingModule,
-    MatTreeModule,
-    MatIconModule,
-    MatButtonModule,
-    MatInputModule,
-    MatCardModule,
-    FormsModule
-  ]
+    imports: [
+        CommonModule,
+        AnalystPanelRoutingModule,
+        MatTreeModule,
+        MatIconModule,
+        MatButtonModule,
+        MatInputModule,
+        MatCardModule,
+        FormsModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatTableModule
+    ]
 })
 export class AnalystPanelModule {}

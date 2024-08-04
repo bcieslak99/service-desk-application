@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {AuthService} from "../../../../services/auth.service";
+import {Ticket} from "../../../../models/ticket.interfaces";
+import {TicketHttpService} from "../../../shared/services/ticket-http.service";
 
 interface TreeNode {
   name: string;
@@ -174,10 +176,15 @@ export class AnalystPanelComponent
     }
   ];
 
-  constructor(private auth: AuthService)
+  constructor(private auth: AuthService, private httpTicketService: TicketHttpService)
   {
     this.dataSource.data = this.treeData;
   }
 
   hasChild = (_: number, node: TreeNode) => !!node.children && node.children.length > 0;
+
+  getTicketsOfGroups(ticketType: string, ticketStatus: string)
+  {
+    return this.httpTicketService.getTicketsOfGroups(ticketType, ticketStatus);
+  }
 }

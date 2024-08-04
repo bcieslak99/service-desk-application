@@ -15,4 +15,5 @@ public interface TicketRepository
     List<Ticket> getTicketsByTypeAndStatus(UUID userId, TicketType ticketType, TicketStatus ticketStatus);
     Optional<Ticket> getTicketGroupAndReporterByTicketId(UUID ticketId);
     Optional<Ticket> getTicketDetailsById(UUID ticketId);
+    List<Ticket> getTicketOfMyGroupsByStatusAndTicketType(TicketStatus ticketStatus, TicketType ticketType, UUID userId);
 }
