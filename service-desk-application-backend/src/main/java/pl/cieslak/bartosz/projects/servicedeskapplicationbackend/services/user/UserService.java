@@ -29,7 +29,7 @@ public class UserService
     {
         try
         {
-            if(principal == null || principal.getName() == null) return null;
+            if(principal == null || principal.getName() == null || principal.getName().trim().isEmpty()) return null;
             return UUID.fromString(principal.getName());
         }
         catch (Exception exception)

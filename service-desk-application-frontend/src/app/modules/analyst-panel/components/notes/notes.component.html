@@ -1,0 +1,35 @@
+<div class="row">
+  <div class="col-12">
+    <button (click)="createNote()" type="button" mat-raised-button><mat-icon>note_alt</mat-icon> Utwórz notatkę</button>
+  </div>
+</div>
+<div class="row mt-3" *ngIf="notes.length > 0; else empty">
+  <div *ngFor="let note of notes" class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex flex-column mt-3">
+    <mat-card class="flex-grow-1">
+      <mat-card-header>
+        <mat-card-title [innerHTML]="convertText(note.title)"></mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="mt-3">
+        <p [innerHTML]="convertText(note.description)"></p>
+      </mat-card-content>
+      <mat-card-actions class="mt-auto">
+        <button (click)="deleteNote(note)" type="button" mat-flat-button><mat-icon>delete</mat-icon> Usuś</button>
+        <button (click)="editNote(note)" type="button" mat-flat-button><mat-icon>edit</mat-icon> Edytuj</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
+<ng-template #empty>
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Brak notatek</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="mt-3">
+          <p>Brak notatek do wyświetlenia.<br>Utwórz nową notatkę za pomocą przycisku w lewym górnym rogu.</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</ng-template>

@@ -16,8 +16,9 @@ import { RegisterTicketComponent } from './components/register/register-ticket/r
 import { RegisterIncidentComponent } from './components/register/register-incident/register-incident.component';
 import { RegisterServiceRequestComponent } from './components/register/register-service-request/register-service-request.component';
 import {SharedModule} from "../shared/shared.module";
-
-
+import { NotesComponent } from './components/notes/notes.component';
+import { DialogNoteEditorComponent } from './components/dialog-note-editor/dialog-note-editor.component';
+import {MatDialogModule} from "@angular/material/dialog";
 
 @NgModule({
   declarations: [
@@ -25,7 +26,9 @@ import {SharedModule} from "../shared/shared.module";
     TicketListComponent,
     RegisterTicketComponent,
     RegisterIncidentComponent,
-    RegisterServiceRequestComponent
+    RegisterServiceRequestComponent,
+    NotesComponent,
+    DialogNoteEditorComponent
   ],
   imports: [
     CommonModule,
@@ -40,7 +43,8 @@ import {SharedModule} from "../shared/shared.module";
     MatSortModule,
     MatTableModule,
     ReactiveFormsModule,
-    SharedModule
+    SharedModule,
+    MatDialogModule
   ]
 })
 export class AnalystPanelModule {}

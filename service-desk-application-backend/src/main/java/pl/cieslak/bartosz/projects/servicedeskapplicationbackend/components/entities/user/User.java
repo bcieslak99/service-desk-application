@@ -13,6 +13,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Component;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.UserContactDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.UserDetailsDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.Note;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketActivity;
@@ -99,6 +100,9 @@ public class User
 
     @OneToMany(mappedBy = "analyst")
     private List<TicketActivity> ticketActivities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner")
+    private List<Note> notes = new ArrayList<>();
 
     public UserDetailsDTO prepareUserDetails()
     {

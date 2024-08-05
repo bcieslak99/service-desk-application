@@ -78,9 +78,9 @@
               <p>Jeżeli chcesz stworzyć zadanie wewnętrzne, możesz zrobić to w tym panelu</p>
               <p>Dodatkowo możesz tworzyć notatki, które później mogą Ci pomóc w realizacji zadań.</p>
               <div class="mt-3">
-                <a class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>task</mat-icon> Utwórz zadanie dla siebie</a>
-                <a class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>task</mat-icon> Utwórz zadanie dla grupy</a>
-                <a class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>note_alt</mat-icon> Utwórz notatkę</a>
+                <button type="button" class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>task</mat-icon> Utwórz zadanie dla siebie</button>
+                <button type="button" class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>task</mat-icon> Utwórz zadanie dla grupy</button>
+                <button type="button" class="mx-2 mt-3 mt-lg-2" mat-raised-button><mat-icon>note_alt</mat-icon> Utwórz notatkę</button>
               </div>
             </mat-card-content>
           </mat-card>
@@ -157,6 +157,10 @@
 
       <div *ngSwitchCase="GROUP_SERVICE_REQUEST_RESOLVED" class="mt-3">
         <app-ticket-list [title]="'Wnioski o usługę, które zostały zrealizowane'" [ticketsRequest]="getTicketsOfGroups('SERVICE_REQUEST', 'RESOLVED')"></app-ticket-list>
+      </div>
+
+      <div *ngSwitchCase="NOTES" class="mt-3">
+        <app-notes></app-notes>
       </div>
 
     </div>

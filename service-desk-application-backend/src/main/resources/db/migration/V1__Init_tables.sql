@@ -96,3 +96,16 @@ create table tickets_activities
     foreign key (ticket) references tickets(id),
     foreign key (analyst) references users(id)
 );
+
+create table notes
+(
+    id uuid not null unique,
+    title varchar(500) not null,
+    description varchar(3000) not null,
+    created_at timestamp(6) not null,
+    last_update_at timestamp(6) not null,
+    is_deleted boolean not null,
+    owner uuid not null,
+    primary key (id),
+    foreign key (owner) references users(id)
+)
