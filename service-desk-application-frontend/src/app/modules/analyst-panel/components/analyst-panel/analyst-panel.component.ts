@@ -5,6 +5,10 @@ import {AuthService} from "../../../../services/auth.service";
 import {TicketHttpService} from "../../../shared/services/ticket-http.service";
 import {NotifierService} from "angular-notifier";
 import {Router} from "@angular/router";
+import {NoteService} from "../services/note.service";
+import {Note} from "../../../../models/note-interfaces";
+import {DialogNoteEditorComponent} from "../dialog-note-editor/dialog-note-editor.component";
+import {MatDialog} from "@angular/material/dialog";
 
 interface TreeNode {
   name: string;
@@ -181,7 +185,9 @@ export class AnalystPanelComponent
     private auth: AuthService,
     private httpTicketService: TicketHttpService,
     private notifier: NotifierService,
-    private router: Router
+    private router: Router,
+    private noteService: NoteService,
+    private dialog: MatDialog
   )
   {
     this.dataSource.data = this.treeData;
@@ -211,5 +217,24 @@ export class AnalystPanelComponent
         this.notifier.notify("error", "Nie udało się pobrać informacji na temat zgłoszenia!");
       }
     })
+  }
+
+  openNoteEditor()
+  {
+    return this.dialog.open(DialogNoteEditorComponent, {data: {title: "", description: ""}});
+  }
+
+  createNote(): void
+  {
+    this.openNoteEditor().afterClosed().subscribe(result => {
+      if(result !== null && result !== undefined) this.noteService.createNote(result).subscribe({
+        next: note => {
+          this.notifier.notify("success", "Notatka została utworzona.");
+        },
+        error: err => {
+          this.notifier.notify("error", "Napotkano na błąd podczas tworzenia notatki!");
+        }
+      });
+    });
   }
 }
