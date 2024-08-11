@@ -17,10 +17,24 @@ import {GlobalSpinnerInterceptor} from "./guards_and_interceptors/global-spinner
 import {AuthorizationInterceptor} from "./guards_and_interceptors/authorization.interceptor";
 import { AccessDeniedViewComponent } from './components/access-denied-view/access-denied-view.component';
 import {MatMenuModule} from "@angular/material/menu";
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/core";
+import {CustomDateAdapter} from "./adapters/month-adapter";
 
 const notifierConfig: NotifierOptions = {
   theme: "material"
 }
+
+const MY_FORMATS = {
+  parse: {
+    dateInput: 'DD.MM.YYYY',
+  },
+  display: {
+    dateInput: 'DD.MM.YYYY',
+    monthYearLabel: 'MMMM YYYY',
+    dateA11yLabel: 'DD.MM.YYYY',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @NgModule({
   declarations: [
@@ -43,8 +57,11 @@ const notifierConfig: NotifierOptions = {
         MatMenuModule
     ],
   providers: [
+    { provide: DateAdapter, useClass: CustomDateAdapter },
     {provide: HTTP_INTERCEPTORS, useClass: GlobalSpinnerInterceptor, multi: true},
-    {provide: HTTP_INTERCEPTORS, useClass: AuthorizationInterceptor, multi: true}
+    {provide: HTTP_INTERCEPTORS, useClass: AuthorizationInterceptor, multi: true},
+    { provide: MAT_DATE_LOCALE, useValue: 'pl-PL' },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
   ],
   bootstrap: [AppComponent]
 })

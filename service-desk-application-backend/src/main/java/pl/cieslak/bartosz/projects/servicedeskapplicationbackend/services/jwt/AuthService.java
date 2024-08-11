@@ -16,12 +16,16 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.user.NewUserDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.groups.SupportGroup;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.IncorrectPasswordException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.group.GroupsRepository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.user.UserRepository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
+import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,6 +43,7 @@ public class AuthService
 
     private final UserRepository USER_REPOSITORY;
     private final UserService USER_SERVICE;
+    private final GroupsRepository GROUP_REPOSITORY;
     private final PasswordEncoder PASSWORD_ENCODER;
     private final AuthenticationManager AUTHENTICATION_MANAGER;
     private final JWTService JWT_SERVICE;
@@ -224,5 +229,12 @@ public class AuthService
         {
             return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
         }
+    }
+
+    public boolean userIsGroupManager(Principal principal)
+    {
+        if(principal == null || principal.getName() == null || principal.getName().trim().isEmpty()) return false;
+        List<SupportGroup> groupsInDatabase = this.GROUP_REPOSITORY.getGroupsWhereUserIsManager(this.USER_SERVICE.extractUserId(principal));
+        return groupsInDatabase.size() > 0;
     }
 }

@@ -70,7 +70,7 @@ export class NotesComponent implements AfterViewInit
   editNote(note: Note): void
   {
     this.openNoteEditor(note).afterClosed().subscribe(data => {
-      this.http.editNote(note.id, data).subscribe({
+      if(data !== null && data !== undefined) this.http.editNote(note.id, data).subscribe({
         next: result => {
           this.loadNotes();
           this.notifier.notify("success", "Notatka została edytowana");

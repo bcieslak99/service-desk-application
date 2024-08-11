@@ -41,14 +41,14 @@ export class AnalystPanelComponent
   GROUP_SERVICE_REQUEST_IN_PROGRESS: string = 'GROUP_SERVICE_REQUEST_IN_PROGRESS';
   GROUP_SERVICE_REQUEST_ON_HOLD: string = 'GROUP_SERVICE_REQUEST_ON_HOLD';
   GROUP_SERVICE_REQUEST_RESOLVED: string = 'GROUP_SERVICE_REQUEST_RESOLVED'
-  CURRENT_STATE_OF_TICKETS: string = 'CURRENT_STATE_OF_TICKETS';
   MONTHLY_PERFORMANCE: string = 'MONTHLY_PERFORMANCE';
-  POPULAR_CATEGORIES: string = 'POPULAR_CATEGORIES';
   GROUP_ACTIVITIES: string = 'GROUP_ACTIVITIES';
-  MY_TASKS: string = 'MY_TASKS';
   TASKS_OF_MY_GROUPS: string = 'TASKS_OF_MY_GROUPS';
+  TASK_SET_CREATOR: string = "TASK_SET_CREATOR"
+  TASK_SET_DETAILS: string = "TASK_SET_DETAILS";
   NOTES: string = 'NOTES';
   ticketId: string = '';
+  taskSetId: string = ""
 
   treeData: TreeNode[] = [
     {
@@ -142,17 +142,8 @@ export class AnalystPanelComponent
       ]
     },
     {
-      name: 'Zadania',
-      children: [
-        {
-          name: 'Moje zadania',
-          action: () => this.panel = this.MY_TASKS
-        },
-        {
-          name: 'Zadania mojej grupy',
-          action: () => this.panel = this.TASKS_OF_MY_GROUPS
-        }
-      ]
+      name: 'Zadania mojej grupy',
+      action: () => this.panel = this.TASKS_OF_MY_GROUPS
     },
     {
       name: 'Notatki',
@@ -162,16 +153,8 @@ export class AnalystPanelComponent
       name: 'Raporty',
       children: [
         {
-          name: 'Obecny stan zgłoszeń',
-          action: () => this.panel = this.CURRENT_STATE_OF_TICKETS
-        },
-        {
           name: 'Miesięczna realizacja',
           action: () => this.panel = this.MONTHLY_PERFORMANCE
-        },
-        {
-          name: "Popularoność kategorii",
-          action: () => this.panel = this.POPULAR_CATEGORIES
         },
         {
           name: 'Aktywność grup',
@@ -236,5 +219,22 @@ export class AnalystPanelComponent
         }
       });
     });
+  }
+
+  showTaskSetDetails(taskSetId: string): void
+  {
+    this.panel = this.TASK_SET_DETAILS;
+    this.taskSetId = taskSetId;
+  }
+
+  showTaskCreator(): void
+  {
+    if(this.userIsGroupManager())
+      this.panel = this.TASK_SET_CREATOR;
+  }
+
+  userIsGroupManager(): boolean
+  {
+    return this.auth.userIsManager();
   }
 }

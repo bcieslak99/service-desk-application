@@ -40,11 +40,22 @@ export class AuthService
     return this.router.createUrlTree(['/auth/login']);
   }
 
+  loadUserGroupPermissions(): void
+  {
+    this.http.get<string[]>(ApplicationSettings.apiUrl + "/api/v1/auth/permissions/group/manager", {headers: {"Authorization" : "Barear " + this.userLogged?.token}}).subscribe({
+      next: result => {
+        if(this.userLogged !== null)
+          result.forEach(role => this.userLogged?.roles.push(role));
+      }
+    });
+  }
+
   loginUser(userData: UserCredentials,)
   {
     this.getToken(userData).subscribe({
       next: value => {
         this.userLogged = value;
+        this.loadUserGroupPermissions();
         localStorage.setItem("userLogged", JSON.stringify(value));
         this.router.navigateByUrl(this.redirectUser());
         this.showLogoutButton.next(true);
@@ -86,6 +97,7 @@ export class AuthService
           this.userLogged = value;
           localStorage.setItem("userLogged", JSON.stringify(value));
           this.showLogoutButton.next(true);
+          this.loadUserGroupPermissions();
         },
         error: err => {
           localStorage.removeItem("userLogged");
@@ -120,5 +132,10 @@ export class AuthService
   userIsSystemAdministrator(): boolean
   {
     return this.getUserRoles().filter(element => element === "SYSTEM_ADMINISTRATOR").length > 0;
+  }
+
+  userIsManager(): boolean
+  {
+    return this.getUserRoles().filter(element => element === "GROUP_MANAGER").length > 0;
   }
 }

@@ -19,6 +19,12 @@ import {SharedModule} from "../shared/shared.module";
 import { NotesComponent } from './components/notes/notes.component';
 import { DialogNoteEditorComponent } from './components/dialog-note-editor/dialog-note-editor.component';
 import {MatDialogModule} from "@angular/material/dialog";
+import { TasksListComponent } from './components/tasks-list/tasks-list.component';
+import { TaskSetCreatorComponent } from './components/task-set-creator/task-set-creator.component';
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MatNativeDateModule} from "@angular/material/core";
+import {MatSelectModule} from "@angular/material/select";
+import { TaskSetDetailsComponent } from './components/task-set-details/task-set-details.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +34,10 @@ import {MatDialogModule} from "@angular/material/dialog";
     RegisterIncidentComponent,
     RegisterServiceRequestComponent,
     NotesComponent,
-    DialogNoteEditorComponent
+    DialogNoteEditorComponent,
+    TasksListComponent,
+    TaskSetCreatorComponent,
+    TaskSetDetailsComponent
   ],
   imports: [
     CommonModule,
@@ -44,7 +53,10 @@ import {MatDialogModule} from "@angular/material/dialog";
     MatTableModule,
     ReactiveFormsModule,
     SharedModule,
-    MatDialogModule
+    MatDialogModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSelectModule
   ]
 })
 export class AnalystPanelModule {}

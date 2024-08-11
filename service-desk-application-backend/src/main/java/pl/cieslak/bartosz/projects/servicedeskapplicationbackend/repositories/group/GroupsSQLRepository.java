@@ -29,4 +29,7 @@ interface GroupsSQLRepository extends JpaRepository<SupportGroup, UUID>, GroupsR
 
     @Query("select sg from SupportGroup as sg left join fetch sg.groupManager as gm where sg.groupActive = true")
     List<SupportGroup> getActiveGroups();
+
+    @Query("select sg from SupportGroup as sg left join fetch sg.groupManager as gm where gm.id = :userId")
+    List<SupportGroup> getGroupsWhereUserIsManager(@Param("userId") UUID userId);
 }

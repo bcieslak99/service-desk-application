@@ -108,4 +108,42 @@ create table notes
     owner uuid not null,
     primary key (id),
     foreign key (owner) references users(id)
-)
+);
+
+create table task_sets
+(
+    id uuid not null unique,
+    title varchar(200) not null,
+    created_at timestamp(6) not null,
+    last_activity timestamp(6) not null,
+    planned_end_date timestamp(6) not null,
+    real_end_date timestamp(6),
+    last_notification timestamp(6),
+    support_group uuid not null,
+    primary key (id),
+    foreign key (support_group) references support_groups(id)
+
+);
+
+create table tasks
+(
+    id uuid not null unique,
+    description varchar(2000) not null,
+    done boolean not null,
+    position int not null,
+    tasks_set uuid not null,
+    primary key (id),
+    foreign key (tasks_set) references task_sets(id)
+);
+
+create table task_comments
+(
+    id uuid not null unique,
+    comment varchar(3000) not null,
+    created_at timestamp(6) not null,
+    author uuid not null,
+    task_set uuid not null,
+    primary key (id),
+    foreign key (author) references users(id),
+    foreign key (task_set) references task_sets(id)
+);

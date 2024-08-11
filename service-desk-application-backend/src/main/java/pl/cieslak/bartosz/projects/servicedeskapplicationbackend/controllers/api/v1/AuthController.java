@@ -16,6 +16,9 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.jwt.AuthService;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -88,5 +91,21 @@ public class AuthController
             return ResponseEntity.badRequest().body(new ResponseMessage("Nowe hasło jest nieprawidłowe!", ResponseCode.ERROR));
 
         return this.AUTH_SERVICE.changeUSerPassword(userId, password.getPassword());
+    }
+
+    @GetMapping("/permissions/group/manager")
+    @PreAuthorize("hasAnyAuthority('FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<List<String>> userIsGroupManager(Principal principal)
+    {
+        ArrayList<String> roles = new ArrayList<>();
+        roles.ensureCapacity(1);
+
+        if(this.AUTH_SERVICE.userIsGroupManager(principal))
+        {
+            roles.add("GROUP_MANAGER");
+            return ResponseEntity.ok(roles);
+        }
+
+        return ResponseEntity.ok(roles);
     }
 }

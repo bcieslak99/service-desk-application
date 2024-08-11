@@ -11,9 +11,11 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.NewGroupDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseMessage;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.GroupsService;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -135,5 +137,23 @@ public class GroupController
     public ResponseEntity<List<GroupDetailsDTO>> getActiveGroups()
     {
         return this.GROUP_SERVICE.getActiveGroups();
+    }
+
+    @GetMapping("/list/active/manager")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMINISTRATOR', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<?> getActiveGroupsWhereUserIsManager(Principal principal)
+    {
+        try
+        {
+            return ResponseEntity.ok(this.GROUP_SERVICE.getActiveGroupsWhereUserIsManager(principal));
+        }
+        catch (UserNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch (Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage("Napotkano na nieoczekiwany błąd!", ResponseCode.ERROR));
+        }
     }
 }

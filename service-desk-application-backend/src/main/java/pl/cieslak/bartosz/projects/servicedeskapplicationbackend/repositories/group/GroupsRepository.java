@@ -17,4 +17,5 @@ public interface GroupsRepository
     Optional<SupportGroup> getSupportGroupAndManagerById(UUID groupId);
     List<User> getMembersFromGroup(UUID groupId);
     List<SupportGroup> getActiveGroups();
+    List<SupportGroup> getGroupsWhereUserIsManager(UUID userId);
 }

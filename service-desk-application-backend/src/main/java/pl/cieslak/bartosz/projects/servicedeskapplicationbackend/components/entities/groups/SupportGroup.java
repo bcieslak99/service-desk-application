@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.stereotype.Component;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupDetailsDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tasks.TaskSet;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketCategory;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.user.User;
@@ -65,6 +66,9 @@ public class SupportGroup
 
     @OneToMany(mappedBy = "defaultGroup")
     private List<TicketCategory> ownedCategories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "group")
+    private List<TaskSet> taskSets = new ArrayList<>();
 
     public GroupDetailsDTO prepareGroupDetails()
     {

@@ -521,4 +521,20 @@ public class GroupsService
 
         return ResponseEntity.ok(groups);
     }
+
+    public List<GroupDetailsDTO> getActiveGroupsWhereUserIsManager(Principal principal) throws Exception
+    {
+        if(principal == null || principal.getName() == null || principal.getName().trim().isEmpty())
+            throw new UserNotFoundException("Twoje konto nie zostało rozpoznane!");
+
+        List<SupportGroup> groupsInDatabase = this.GROUP_REPOSITORY.getGroupsWhereUserIsManager(this.USER_SERVICE.extractUserId(principal));
+        groupsInDatabase = groupsInDatabase.stream().filter(SupportGroup::isGroupActive).collect(Collectors.toList());
+
+        ArrayList<GroupDetailsDTO> groups = new ArrayList<>();
+        if(groupsInDatabase.size() > 0) groups.ensureCapacity(groupsInDatabase.size());
+
+        groupsInDatabase.forEach(element -> groups.add(element.prepareGroupDetails()));
+
+        return groups;
+    }
 }
