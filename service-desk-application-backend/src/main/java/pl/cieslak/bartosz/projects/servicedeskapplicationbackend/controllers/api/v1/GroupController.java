@@ -105,7 +105,7 @@ public class GroupController
     }
 
     @GetMapping("/members/{id}")
-    @PreAuthorize("hasAuthority('SYSTEM_ADMINISTRATOR')")
+    @PreAuthorize("hasAnyAuthority('SYSTEM_ADMINISTRATOR', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
     public ResponseEntity<?> getMembersOfGroup(@PathVariable("id") UUID groupId)
     {
         return this.GROUP_SERVICE.getGroupMembers(groupId);

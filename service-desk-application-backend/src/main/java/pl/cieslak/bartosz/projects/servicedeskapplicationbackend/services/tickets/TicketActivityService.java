@@ -11,6 +11,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.ti
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -207,5 +208,24 @@ public class TicketActivityService
         activity.setUserCanSee(false);
         activity.setActivityDate(LocalDateTime.now());
         this.TICKET_ACTIVITY_REPOSITORY.saveAndFlush(activity);
+    }
+
+    public void addCloseStatusChangeActivity(Ticket ticket)
+    {
+        Optional<TicketActivity> lastChangeStatus = ticket.getTicketActivities().stream()
+                .filter(activity -> activity.getTicketActivityType()
+                        .equals(TicketActivityType.CHANGE_STATUS)).min((a, b) -> b.getActivityDate().compareTo(a.getActivityDate()));
+
+       if(lastChangeStatus.isEmpty()) return;
+       TicketActivity lastActivity = lastChangeStatus.get();
+
+       TicketActivity activity = new TicketActivity();
+       activity.setTicketActivityType(TicketActivityType.CLOSE_TICKET);
+       activity.setDescription("Zgłoszenie zostało zamknięte");
+       activity.setTicket(ticket);
+       activity.setAnalyst(lastActivity.getAnalyst());
+       activity.setUserCanSee(false);
+       activity.setActivityDate(LocalDateTime.now());
+       this.TICKET_ACTIVITY_REPOSITORY.saveAndFlush(activity);
     }
 }

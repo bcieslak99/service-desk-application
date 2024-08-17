@@ -1,6 +1,7 @@
 package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.auth.PermissionsToTicket;
@@ -22,6 +23,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exce
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.repositories.tickets.TicketRepository;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.GroupsService;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.MailService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
 import java.security.Principal;
@@ -38,6 +40,7 @@ public class TicketService
     private final TicketCategoryService TICKET_CATEGORY_SERVICE;
     private final TicketActivityService TICKET_ACTIVITY_SERVICE;
     private final GroupsService GROUP_SERVICE;
+    private final MailService MAIL_SERVICE;
 
     private static final String USER_NOT_FOUND_MESSAGE = "Nie rozpoznano Twojego konta!";
     private static final String CUSTOMER_NOT_FOUND_MESSAGE = "Nie odnaleziono wskazanego użytkownika!";
@@ -444,6 +447,15 @@ public class TicketService
             throw new PermissionDeniedException(PERMISSION_DENIED_MESSAGE);
 
         this.TICKET_ACTIVITY_SERVICE.addReminder(ticket, user, comment);
+
+        if(ticket.getAssigneeAnalyst() != null)
+        {
+            try
+            {
+                this.MAIL_SERVICE.sendReminderAboutTicket(ticket.getAssigneeAnalyst().getMail(), ticketId, ticket.getCategory().getName(), comment);
+            }
+            catch(Exception ignored) {}
+        }
     }
 
     @Transactional
@@ -647,5 +659,18 @@ public class TicketService
     {
         if(ticketId == null) return false;
         return this.TICKET_REPOSITORY.getTicketDetailsById(ticketId).isPresent();
+    }
+
+    @Scheduled(fixedDelay = 180000)
+    public void closeResolvedTickets()
+    {
+        List<Ticket> ticketsToClose = this.TICKET_REPOSITORY.getTicketsWithResolveDateBefore(LocalDateTime.now().minusDays(7));
+
+        ticketsToClose.forEach(ticket -> {
+            ticket.setStatus(TicketStatus.CLOSED);
+            ticket.setCloseDate(LocalDateTime.now());
+            this.TICKET_REPOSITORY.saveAndFlush(ticket);
+            this.TICKET_ACTIVITY_SERVICE.addCloseStatusChangeActivity(ticket);
+        });
     }
 }

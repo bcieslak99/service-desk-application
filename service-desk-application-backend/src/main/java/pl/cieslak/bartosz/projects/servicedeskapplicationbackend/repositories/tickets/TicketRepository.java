@@ -4,6 +4,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.enti
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketStatus;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketType;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,4 +18,5 @@ public interface TicketRepository
     Optional<Ticket> getTicketDetailsById(UUID ticketId);
     List<Ticket> getTicketOfMyGroupsByStatusAndTicketType(TicketStatus ticketStatus, TicketType ticketType, UUID userId);
     List<Ticket> getUserTicketsByStatusAndType(TicketStatus ticketStatus, TicketType ticketType, UUID userId);
+    List<Ticket> getTicketsWithResolveDateBefore(LocalDateTime date);
 }

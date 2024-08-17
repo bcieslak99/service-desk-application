@@ -8,6 +8,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.enti
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketStatus;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketType;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,4 +57,7 @@ interface TicketSQLRepository extends JpaRepository<Ticket, UUID>, TicketReposit
             "left join fetch t.category as ca " +
             "where aa.id = :userId and t.ticketType = :ticketType and t.status = :ticketStatus")
     List<Ticket> getUserTicketsByStatusAndType(@Param("ticketStatus") TicketStatus ticketStatus, @Param("ticketType") TicketType ticketType, @Param("userId") UUID userId);
+
+    @Query("SELECT t FROM Ticket as t left join fetch t.ticketActivities as ta left join fetch ta.analyst as a WHERE t.resolveDate <= :date and t.closeDate is null")
+    List<Ticket> getTicketsWithResolveDateBefore(@Param("date") LocalDateTime date);
 }

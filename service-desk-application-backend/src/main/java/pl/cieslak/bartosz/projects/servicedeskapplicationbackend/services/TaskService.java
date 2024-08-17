@@ -1,6 +1,7 @@
 package pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.task.TaskFormDTO;
@@ -25,6 +26,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.U
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,6 +46,7 @@ public class TaskService
     private final TaskCommentRepository TASK_COMMENT_REPOSITORY;
     private final GroupsService GROUP_SERVICE;
     private final UserService USER_SERVICE;
+    private final MailService MAIL_SERVICE;
 
     public boolean userCanCreateTaskForGroup(UUID userId, UUID groupId)
     {
@@ -195,5 +198,37 @@ public class TaskService
         taskComment.setAuthorOfComment(user);
 
         this.TASK_COMMENT_REPOSITORY.saveAndFlush(taskComment);
+    }
+
+    @Scheduled(fixedDelay = 1800000)
+    public void remindAboutTask()
+    {
+        List<TaskSet> taskSets = this.TASK_SET_REPOSITORY.getTaskSetsToSendRemind(LocalDateTime.now().plusDays(7), LocalDateTime.now().minusDays(1));
+
+        taskSets.forEach(taskSet ->
+        {
+            String taskSetTitle = "Tytuł zbioru zadań: " + taskSet.getTitle();
+            String supportGroupName = "Grupa wsparcia: " + taskSet.getGroup().getName();
+            String plannedEndDate = "Planowana data realizacji: " + DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss").format(taskSet.getPlannedEndDate());
+
+            Optional<SupportGroup> groupInDatabase = this.GROUP_SERVICE.getGroupAndMembersById(taskSet.getGroup().getId());
+
+            if(groupInDatabase.isPresent())
+            {
+                SupportGroup group = groupInDatabase.get();
+                List<User> members = group.getGroupMembers();
+
+                members.forEach(member ->
+                {
+                    try
+                    {
+                        this.MAIL_SERVICE.sendReminderAboutTask(member.getMail(), supportGroupName, taskSetTitle, plannedEndDate);
+                        taskSet.setLastNotification(LocalDateTime.now());
+                        this.TASK_SET_REPOSITORY.saveAndFlush(taskSet);
+                    }
+                    catch (Exception ignored) {}
+                });
+            }
+        });
     }
 }
