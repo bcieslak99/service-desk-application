@@ -147,3 +147,16 @@ create table task_comments
     foreign key (author) references users(id),
     foreign key (task_set) references task_sets(id)
 );
+
+create table attachments
+(
+    id uuid not null unique,
+    name varchar(300) not null,
+    ticket_id uuid not null,
+    file_owner uuid not null,
+    added_at timestamp(6) not null,
+    deleted boolean not null,
+    primary key (id),
+    foreign key (ticket_id) references tickets(id),
+    foreign key (file_owner) references users(id)
+)

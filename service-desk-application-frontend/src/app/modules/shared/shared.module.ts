@@ -17,6 +17,7 @@ import {MatMenuModule} from "@angular/material/menu";
 import { SelectingStatusDialogComponent } from './components/dialogs/selecting-status-dialog/selecting-status-dialog.component';
 import { CommentDialogComponent } from './components/dialogs/comment-dialog/comment-dialog.component';
 import { SelectingGroupDialogComponent } from './components/dialogs/selecting-group-dialog/selecting-group-dialog.component';
+import { AttachmentManagerComponent } from './components/attachment-manager/attachment-manager.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { SelectingGroupDialogComponent } from './components/dialogs/selecting-gr
     TicketDetailsComponent,
     SelectingStatusDialogComponent,
     CommentDialogComponent,
-    SelectingGroupDialogComponent
+    SelectingGroupDialogComponent,
+    AttachmentManagerComponent
   ],
     imports: [
         CommonModule,

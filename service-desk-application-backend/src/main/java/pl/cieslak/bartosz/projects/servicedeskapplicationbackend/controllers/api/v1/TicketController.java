@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.activities.TicketCommentDTO;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.attachment.AttachmentDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.categories.CategoryIdDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.groups.GroupIdDTO;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.dto.responses.ResponseCode;
@@ -24,14 +26,13 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exce
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.system.PermissionDeniedException;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.ticket.*;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.exceptions.users.UserNotFoundException;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketAttachmentService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.tickets.TicketService;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.services.user.UserService;
 
+import java.io.FileNotFoundException;
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,6 +42,7 @@ public class TicketController
 {
     private final TicketService TICKET_SERVICE;
     private final UserService USER_SERVICE;
+    private final TicketAttachmentService TICKET_ATTACHMENT_SERVICE;
 
     private static final String INTERNAL_ERROR_MESSAGE = "Napotkano na nieoczekiwany błąd!";
 
@@ -441,5 +443,53 @@ public class TicketController
         {
             return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
         }
+    }
+
+    @PostMapping("/attachment/add/{ticketId}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<ResponseMessage> uploadAttachment(@PathVariable("ticketId") UUID ticketId, Principal principal, @RequestParam("file") MultipartFile file)
+    {
+        if(file.isEmpty())
+            return ResponseEntity.badRequest().body(new ResponseMessage("Nie wskazano pliku to przesłania", ResponseCode.ERROR));
+
+        try
+        {
+            this.TICKET_ATTACHMENT_SERVICE.uploadAttachment(ticketId, principal, file);
+            return ResponseEntity.ok(new ResponseMessage("Plik został przesłany", ResponseCode.SUCCESS));
+        }
+        catch(UserNotFoundException | TicketNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @GetMapping("/attachment/download/{attachmentId}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<?> downloadFile(@PathVariable("attachmentId") UUID attachmentId)
+    {
+        try
+        {
+            return this.TICKET_ATTACHMENT_SERVICE.downloadAttachment(attachmentId);
+        }
+        catch(FileNotFoundException exception)
+        {
+            return ResponseEntity.badRequest().body(new ResponseMessage(exception.getMessage(), ResponseCode.ERROR));
+        }
+        catch(Exception exception)
+        {
+            exception.printStackTrace();
+            return ResponseEntity.internalServerError().body(new ResponseMessage(INTERNAL_ERROR_MESSAGE, ResponseCode.ERROR));
+        }
+    }
+
+    @GetMapping("/attachment/list/{ticketId}")
+    @PreAuthorize("hasAnyAuthority('EMPLOYEE', 'FIRST_LINE_ANALYST', 'SECOND_LINE_ANALYST')")
+    public ResponseEntity<List<AttachmentDTO>> getAttachmentsListFromTicket(@PathVariable("ticketId") UUID ticketId)
+    {
+        return ResponseEntity.ok(this.TICKET_ATTACHMENT_SERVICE.getAttachmentsListFromTicket(ticketId));
     }
 }

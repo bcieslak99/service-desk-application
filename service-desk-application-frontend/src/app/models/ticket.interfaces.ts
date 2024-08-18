@@ -163,3 +163,9 @@ export interface DataToCommentDialogInitialisation
   title: string,
   comment: string
 }
+
+export interface Attachment
+{
+  id: string,
+  name: string
+}

@@ -581,6 +581,12 @@ export class TicketDetailsComponent implements AfterViewInit, OnDestroy
       });
     }
 
+    showAttachments(): string | null
+    {
+      if(this.ticketDetails === undefined || this.ticketDetails?.id === undefined) return null;
+      else return this.ticketDetails.id;
+    }
+
     ngAfterViewInit(): void
     {
       this.loadTicketDetails();

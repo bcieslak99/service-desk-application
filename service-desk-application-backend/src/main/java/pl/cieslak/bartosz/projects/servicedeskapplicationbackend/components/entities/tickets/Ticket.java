@@ -80,6 +80,9 @@ public class Ticket
     @JoinColumn(name = "CATEGORY", nullable = false)
     private TicketCategory category;
 
+    @OneToMany(mappedBy = "ticket")
+    private List<TicketAttachment> attachments = new ArrayList<>();
+
     public TicketDetailsForEmployeeDTO prepareDetailsForEmployee()
     {
         TicketDetailsForEmployeeDTO details = TicketDetailsForEmployeeDTO.builder()

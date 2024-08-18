@@ -18,6 +18,7 @@ import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.enti
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tasks.TaskComment;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.Ticket;
 import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketActivity;
+import pl.cieslak.bartosz.projects.servicedeskapplicationbackend.components.entities.tickets.TicketAttachment;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -107,6 +108,9 @@ public class User
 
     @OneToMany(mappedBy = "authorOfComment")
     private List<TaskComment> commentsToTasks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "fileOwner")
+    private List<TicketAttachment> attachments = new ArrayList<>();
 
     public UserDetailsDTO prepareUserDetails()
     {
