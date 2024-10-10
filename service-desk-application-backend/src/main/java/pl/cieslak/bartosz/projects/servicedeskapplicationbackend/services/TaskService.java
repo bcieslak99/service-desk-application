@@ -200,7 +200,7 @@ public class TaskService
         this.TASK_COMMENT_REPOSITORY.saveAndFlush(taskComment);
     }
 
-    @Scheduled(fixedDelay = 1800000)
+    @Scheduled(fixedDelay = 180_000_0)
     public void remindAboutTask()
     {
         List<TaskSet> taskSets = this.TASK_SET_REPOSITORY.getTaskSetsToSendRemind(LocalDateTime.now().plusDays(7), LocalDateTime.now().minusDays(1));

@@ -5,6 +5,7 @@ import {BehaviorSubject, Observable} from "rxjs";
 import {AuthData, JWTToken, UserCredentials} from "../models/user-data.interfaces";
 import {NotifierService} from "angular-notifier";
 import {Router, UrlTree} from "@angular/router";
+import {userIsNotAnalyst} from "../guards_and_interceptors/guards";
 
 @Injectable({
   providedIn: 'root'
@@ -42,12 +43,15 @@ export class AuthService
 
   loadUserGroupPermissions(): void
   {
-    this.http.get<string[]>(ApplicationSettings.apiUrl + "/api/v1/auth/permissions/group/manager", {headers: {"Authorization" : "Barear " + this.userLogged?.token}}).subscribe({
-      next: result => {
-        if(this.userLogged !== null)
-          result.forEach(role => this.userLogged?.roles.push(role));
-      }
-    });
+    if(this.userIsFirstLineAnalyst() || this.userIsSecondLineAnalyst())
+    {
+      this.http.get<string[]>(ApplicationSettings.apiUrl + "/api/v1/auth/permissions/group/manager", {headers: {"Authorization" : "Barear " + this.userLogged?.token}}).subscribe({
+        next: result => {
+          if(this.userLogged !== null)
+            result.forEach(role => this.userLogged?.roles.push(role));
+        }
+      });
+    }
   }
 
   loginUser(userData: UserCredentials,)
@@ -63,7 +67,6 @@ export class AuthService
       error: err => {
         if(err.error.message !== null && err.error.message instanceof String && err.error.message.trim().length > 0) this.notifier.notify("error", err.error.message);
         else this.notifier.notify("error", "Błąd w komunikacji z serwerem.");
-        console.log("test")
       }
     })
   }

@@ -83,6 +83,7 @@
             <mat-card-content class="mt-3">
               <p><b>Status: </b> {{getTicketStatus()}}</p>
               <p><b>Kategoria: </b> {{ticketDetails?.category?.name}}</p>
+              <p><b>Identyfikator: </b> {{ticketDetails?.id}}</p>
               <p><b>Data utworzenia: </b> {{ticketDetails?.openDate | date: ' dd.MM.yyyy HH:mm:ss'}}</p>
               <p *ngIf="ticketDetails?.resolveDate !== null else noResolveDate"><b>Data rozwiązania: </b> {{ticketDetails?.resolveDate | date: ' dd.MM.yyyy HH:mm:ss'}}</p>
               <ng-template #noResolveDate>

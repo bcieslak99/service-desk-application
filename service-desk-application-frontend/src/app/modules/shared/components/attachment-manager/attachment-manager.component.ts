@@ -81,15 +81,18 @@ export class AttachmentManagerComponent implements AfterViewInit
 
   loadAttachmentsList(): void
   {
-    this.http.get<Attachment[]>("http://localhost:8080/api/v1/ticket/attachment/list/" + this.ticketId).subscribe({
-      next: result => {
-        this.dataSource = new MatTableDataSource<Attachment>(result);
-        this.preparePaginator();
-      },
-      error: err => {
-        this.notifier.notify("error", "Nie udało się pobrać listy załączników!");
-      }
-    });
+    if(this.ticketId !== undefined && this.ticketId !== null)
+    {
+      this.http.get<Attachment[]>("http://localhost:8080/api/v1/ticket/attachment/list/" + this.ticketId).subscribe({
+        next: result => {
+          this.dataSource = new MatTableDataSource<Attachment>(result);
+          this.preparePaginator();
+        },
+        error: err => {
+          this.notifier.notify("error", "Nie udało się pobrać listy załączników!");
+        }
+      });
+    }
   }
 
   preparePaginator(): void

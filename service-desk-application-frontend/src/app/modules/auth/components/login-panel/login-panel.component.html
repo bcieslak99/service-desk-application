@@ -1,4 +1,4 @@
-<div class="container mt-5">
+<div class="container mt-5" *ngIf="!(userIsLoggedIn() | async); else noPermissions">
   <div class="row justify-content-center">
     <div class="col-12 col-sm-11 col-md-9 col-lg-6">
       <h1 class="text-center">Service Desk</h1>
@@ -23,3 +23,13 @@
     </div>
   </div>
 </div>
+<ng-template #noPermissions>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-6 col-lg-4 text-center">
+        <h1>Brak uprawnień</h1>
+        <p>Jesteś zalogowany, ale nie posiadasz uprawnień!</p>
+      </div>
+    </div>
+  </div>
+</ng-template>

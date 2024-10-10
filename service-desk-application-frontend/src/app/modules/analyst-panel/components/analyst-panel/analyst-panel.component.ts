@@ -41,8 +41,6 @@ export class AnalystPanelComponent
   GROUP_SERVICE_REQUEST_IN_PROGRESS: string = 'GROUP_SERVICE_REQUEST_IN_PROGRESS';
   GROUP_SERVICE_REQUEST_ON_HOLD: string = 'GROUP_SERVICE_REQUEST_ON_HOLD';
   GROUP_SERVICE_REQUEST_RESOLVED: string = 'GROUP_SERVICE_REQUEST_RESOLVED'
-  MONTHLY_PERFORMANCE: string = 'MONTHLY_PERFORMANCE';
-  GROUP_ACTIVITIES: string = 'GROUP_ACTIVITIES';
   TASKS_OF_MY_GROUPS: string = 'TASKS_OF_MY_GROUPS';
   TASK_SET_CREATOR: string = "TASK_SET_CREATOR"
   TASK_SET_DETAILS: string = "TASK_SET_DETAILS";
@@ -148,19 +146,6 @@ export class AnalystPanelComponent
     {
       name: 'Notatki',
       action: () => this.panel = this.NOTES
-    },
-    {
-      name: 'Raporty',
-      children: [
-        {
-          name: 'Miesięczna realizacja',
-          action: () => this.panel = this.MONTHLY_PERFORMANCE
-        },
-        {
-          name: 'Aktywność grup',
-          action: () => this.panel = this.GROUP_ACTIVITIES
-        }
-      ]
     }
   ];
 

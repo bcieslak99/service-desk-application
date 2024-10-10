@@ -20,4 +20,9 @@ export class LoginPanelComponent
   {
     this.auth.loginUser(this.loginForm.getRawValue());
   }
+
+  userIsLoggedIn()
+  {
+    return this.auth.userIsLogged();
+  }
 }
